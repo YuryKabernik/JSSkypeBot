@@ -16,7 +16,7 @@ dotenv.config({ path: ENV_FILE });
 // Create HTTP server
 const server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, () => {
-    console.log(`\n${server.name} listening to ${server.url}`);
+    console.log(`\n${ server.name } listening to ${ server.url }`);
     console.log(`\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator`);
     console.log(`\nTo test your bot, see: https://aka.ms/debug-with-emulator`);
 });
@@ -30,7 +30,7 @@ const adapter = new BotFrameworkAdapter({
 
 // Catch-all for errors.
 adapter.onTurnError = async (context, error) => {
-    console.error(`\n [onTurnError]: ${error}`);
+    console.error(`\n [onTurnError]: ${ error }`);
     await context.sendActivity(`Oops. Something went wrong!`); // Send a message to the user
 };
 
