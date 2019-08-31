@@ -1,18 +1,27 @@
 const { ActivityHandler } = require('botbuilder');
 
-class MyBot extends ActivityHandler {
+class SkypeBot extends ActivityHandler {
     constructor() {
         super();
         this._assignOnMembersAdded();
         this._assignOnMessageAction();
+        this._assignOnMemberRemovedActivity();
     }
 
-    /**
-     *  See https://aka.ms/about-bot-activity-message to learn more about the message and other activity types.
-     */
     _assignOnMessageAction() {
         this.onMessage(async (context, next) => {
-            await context.sendActivity(`You said '${ context.activity.text }'`);
+            await context.sendActivity(`${ context.activity.from.name } said '${ context.activity.text }'`); // replace by message parsing.
+            await next();
+        });
+    }
+
+    _assignOnMemberRemovedActivity() {
+        this.onMembersRemoved(async (context, next) => {
+            if (context.activity.from.name === 'bot' || context.activity.from.name === 'Bot') {
+                await context.sendActivity('Никто не знает, какой будет концовка. Чтобы точно знать, что произойдет после смерти, нужно умереть. Хотя у католиков на этот счет есть какие-то надежды. ;(');
+            } else {
+                await context.sendActivity(`Как жаль, что наши птенчики покидают родительское гнездо ;( \n Прощай, @${ context.activity.from.name } !`);
+            }
             await next();
         });
     }
@@ -22,7 +31,7 @@ class MyBot extends ActivityHandler {
             const membersAdded = context.activity.membersAdded;
             for (let cnt = 0; cnt < membersAdded.length; ++cnt) {
                 if (membersAdded[cnt].id !== context.activity.recipient.id) {
-                    await context.sendActivity('Hello and welcome!');
+                    await context.sendActivity('Welcome to the WLN Enhancements Team!');
                 }
             }
             await next();
@@ -30,4 +39,4 @@ class MyBot extends ActivityHandler {
     }
 }
 
-module.exports.MyBot = MyBot;
+module.exports.SkypeBot = SkypeBot;
