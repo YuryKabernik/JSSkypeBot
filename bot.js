@@ -1,4 +1,5 @@
 const { ActivityHandler } = require('botbuilder');
+const { AnswersFormatter } = require('./features/answersFormatter.js');
 
 class SkypeBot extends ActivityHandler {
     constructor() {
@@ -10,18 +11,17 @@ class SkypeBot extends ActivityHandler {
 
     _assignOnMessageAction() {
         this.onMessage(async (context, next) => {
-            await context.sendActivity(`${ context.activity.from.name } said '${ context.activity.text }'`); // replace by message parsing.
+            const botMessage = AnswersFormatter.format('doNotDenyYourselfAnything', { name: context.activity.from.name });
+            await context.sendActivity(botMessage); // replace by message parsing.
             await next();
         });
     }
 
     _assignOnMemberRemovedActivity() {
         this.onMembersRemoved(async (context, next) => {
-            if (context.activity.from.name === 'bot' || context.activity.from.name === 'Bot') {
-                await context.sendActivity('Никто не знает, какой будет концовка. Чтобы точно знать, что произойдет после смерти, нужно умереть. Хотя у католиков на этот счет есть какие-то надежды. ;(');
-            } else {
-                await context.sendActivity(`Как жаль, что наши птенчики покидают родительское гнездо ;( \n Прощай, @${ context.activity.from.name } !`);
-            }
+            const goodbyMessage = (context.activity.from.name === 'bot' || context.activity.from.name === 'Bot') ?
+                AnswersFormatter.lookup('botRemoveLastWords') : AnswersFormatter.format('goodbyeToTheUser', { name: context.activity.from.name });
+            await context.sendActivity(goodbyMessage);
             await next();
         });
     }
@@ -31,7 +31,8 @@ class SkypeBot extends ActivityHandler {
             const membersAdded = context.activity.membersAdded;
             for (let cnt = 0; cnt < membersAdded.length; ++cnt) {
                 if (membersAdded[cnt].id !== context.activity.recipient.id) {
-                    await context.sendActivity('Welcome to the WLN Enhancements Team!');
+                    const welcomMessage = AnswersFormatter.lookup('welcomToTheWLNTeam');
+                    await context.sendActivity(welcomMessage);
                 }
             }
             await next();
