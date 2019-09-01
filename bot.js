@@ -1,9 +1,11 @@
 const { ActivityHandler } = require('botbuilder');
-const { AnswersFormatter } = require('./features/answersFormatter.js');
+const { AnswerDecision } = require('./features/answerDecision.js');
 
 class SkypeBot extends ActivityHandler {
-    constructor() {
+    constructor(botId) {
         super();
+        this.botId = botId;
+        this.answerDecision = new AnswerDecision(botId);
         this._assignOnMembersAdded();
         this._assignOnMessageAction();
         this._assignOnMemberRemovedActivity();
@@ -11,8 +13,12 @@ class SkypeBot extends ActivityHandler {
 
     _assignOnMessageAction() {
         this.onMessage(async (context, next) => {
-            const botMessage = AnswersFormatter.format('doNotDenyYourselfAnything', { name: context.activity.from.name });
-            await context.sendActivity(botMessage); // replace by message parsing.
+            const botMessage = this.answerDecision
+                .answerOnMembersRemoteWork(
+                    context.activity.text,
+                    context.activity.from.name
+                );
+            await context.sendActivity(botMessage);
             await next();
         });
     }
@@ -21,9 +27,11 @@ class SkypeBot extends ActivityHandler {
         this.onMembersRemoved(async (context, next) => {
             const membersRemoved = context.activity.membersRemoved;
             for (let cnt = 0; cnt < membersRemoved.length; ++cnt) {
-                const goodbyMessage = (membersRemoved[cnt].id !== context.activity.recipient.id) ?
-                    AnswersFormatter.format('goodbyeToTheUser', { name: context.activity.from.name }) :
-                    AnswersFormatter.lookup('botRemoveLastWords');
+                const goodbyMessage = this.answerDecision.answerToRemovedMember(
+                    membersRemoved[cnt].id,
+                    context.activity.from.name,
+                    this.botId
+                );
                 await context.sendActivity(goodbyMessage);
             }
             await next();
@@ -34,10 +42,11 @@ class SkypeBot extends ActivityHandler {
         this.onMembersAdded(async (context, next) => {
             const membersAdded = context.activity.membersAdded;
             for (let cnt = 0; cnt < membersAdded.length; ++cnt) {
-                if (membersAdded[cnt].id !== context.activity.recipient.id) {
-                    const welcomMessage = AnswersFormatter.lookup('welcomToTheWLNTeam');
-                    await context.sendActivity(welcomMessage);
-                }
+                const welcomMessage = this.answerDecision.answerToNewMember(
+                    membersAdded[cnt].id,
+                    this.botId
+                );
+                await context.sendActivity(welcomMessage);
             }
             await next();
         });

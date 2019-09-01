@@ -34,12 +34,16 @@ adapter.onTurnError = async (context, error) => {
     await context.sendActivity(`Oops. Something went wrong!`); // Send a message to the user
 };
 
+// To-Do: Add proactive message on the first bot appearanse.
+// adapter.continueConversation('', (context) => context.);
+
 // Create the main dialog.
 const myBot = new SkypeBot();
 
 // Listen for incoming requests.
 server.post('/api/messages', (req, res) => {
     adapter.processActivity(req, res, async (context) => {
-        await myBot.run(context);// Route to main dialog.
+        myBot.botId = context.activity.recipient.id;
+        await myBot.run(context);
     });
 });
