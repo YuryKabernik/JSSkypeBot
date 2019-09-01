@@ -9,6 +9,7 @@ module.exports = {
       "anonymous": "never",
       "asyncArrow": "always"
     }],
-    "template-curly-spacing": [2, "always"]
+    "template-curly-spacing": [2, "always"],
+    "operator-linebreak": [2, "before", { "overrides": { "?": "after" } }]
   }
 };
