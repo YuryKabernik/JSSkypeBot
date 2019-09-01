@@ -19,9 +19,13 @@ class SkypeBot extends ActivityHandler {
 
     _assignOnMemberRemovedActivity() {
         this.onMembersRemoved(async (context, next) => {
-            const goodbyMessage = (context.activity.from.name === 'bot' || context.activity.from.name === 'Bot') ?
-                AnswersFormatter.lookup('botRemoveLastWords') : AnswersFormatter.format('goodbyeToTheUser', { name: context.activity.from.name });
-            await context.sendActivity(goodbyMessage);
+            const membersRemoved = context.activity.membersRemoved;
+            for (let cnt = 0; cnt < membersRemoved.length; ++cnt) {
+                const goodbyMessage = (membersRemoved[cnt].id !== context.activity.recipient.id) ?
+                    AnswersFormatter.format('goodbyeToTheUser', { name: context.activity.from.name }) :
+                    AnswersFormatter.lookup('botRemoveLastWords');
+                await context.sendActivity(goodbyMessage);
+            }
             await next();
         });
     }

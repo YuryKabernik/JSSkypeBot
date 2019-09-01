@@ -10,6 +10,11 @@ module.exports = {
       "asyncArrow": "always"
     }],
     "template-curly-spacing": [2, "always"],
-    "operator-linebreak": [2, "before", { "overrides": { "?": "after" } }]
+    "operator-linebreak": [2, "before", {
+      "overrides": {
+        "?": "after",
+        ":": "after"
+      }
+    }]
   }
 };
