@@ -13,12 +13,15 @@ class SkypeBot extends ActivityHandler {
 
     _assignOnMessageAction() {
         this.onMessage(async (context, next) => {
+            const memberName = context.activity.from.name;
             const botMessage = this.answerDecision
                 .answerOnMembersRemoteWork(
                     context.activity.text,
-                    context.activity.from.name
+                    memberName
                 );
-            await context.sendActivity(botMessage);
+            if (botMessage) {
+                await context.sendActivity(botMessage);
+            }
             await next();
         });
     }
@@ -27,12 +30,16 @@ class SkypeBot extends ActivityHandler {
         this.onMembersRemoved(async (context, next) => {
             const membersRemoved = context.activity.membersRemoved;
             for (let cnt = 0; cnt < membersRemoved.length; ++cnt) {
+                const memberId = membersRemoved[cnt].id;
+                const memberName = membersRemoved[cnt].name;
                 const goodbyMessage = this.answerDecision.answerToRemovedMember(
-                    membersRemoved[cnt].id,
-                    context.activity.from.name,
+                    memberId,
+                    memberName,
                     this.botId
                 );
-                await context.sendActivity(goodbyMessage);
+                if (goodbyMessage) {
+                    await context.sendActivity(goodbyMessage);
+                }
             }
             await next();
         });
@@ -46,7 +53,9 @@ class SkypeBot extends ActivityHandler {
                     membersAdded[cnt].id,
                     this.botId
                 );
-                await context.sendActivity(welcomMessage);
+                if (welcomMessage) {
+                    await context.sendActivity(welcomMessage);
+                }
             }
             await next();
         });
