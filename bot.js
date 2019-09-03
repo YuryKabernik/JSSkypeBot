@@ -14,14 +14,18 @@ class SkypeBot extends ActivityHandler {
 
     _assignOnMessageAction() {
         this.onMessage(async (context, next) => {
-            await this.answerOnRemoteWorkMessage(context);
+            if (!context.activity.conversation.isGroup) {
+                await this.answerOnRemoteWorkMessage(context);
+            }
             await next();
         });
     }
 
     _assignOnTurnAction() {
         this.onTurn(async (context, next) => {
-            await this.answerOnRemoteWorkMessage(context);
+            if (context.activity.conversation.isGroup) {
+                await this.answerOnRemoteWorkMessage(context);
+            }
             await next();
         });
     }
