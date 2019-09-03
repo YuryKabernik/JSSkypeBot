@@ -8,25 +8,25 @@ class SkypeBot extends ActivityHandler {
         this.answerDecision = new AnswerDecision(botId);
         this._assignOnMembersAdded();
         this._assignOnMessageAction();
-        this._assignOnMemberRemovedActivity();
+        this._assignOnTurnAction();
+        this._assignOnMembersRemovedAction();
     }
 
     _assignOnMessageAction() {
         this.onMessage(async (context, next) => {
-            const memberName = context.activity.from.name;
-            const botMessage = this.answerDecision
-                .answerOnMembersRemoteWork(
-                    context.activity.text,
-                    memberName
-                );
-            if (botMessage) {
-                await context.sendActivity(botMessage);
-            }
+            await this.answerOnRemoteWorkMessage(context);
             await next();
         });
     }
 
-    _assignOnMemberRemovedActivity() {
+    _assignOnTurnAction() {
+        this.onTurn(async (context, next) => {
+            await this.answerOnRemoteWorkMessage(context);
+            await next();
+        });
+    }
+
+    _assignOnMembersRemovedAction() {
         this.onMembersRemoved(async (context, next) => {
             const membersRemoved = context.activity.membersRemoved;
             for (let cnt = 0; cnt < membersRemoved.length; ++cnt) {
@@ -59,6 +59,17 @@ class SkypeBot extends ActivityHandler {
             }
             await next();
         });
+    }
+
+    async answerOnRemoteWorkMessage(context) {
+        if (context.activity.text) {
+            const memberName = context.activity.from.name;
+            const botMessage = this.answerDecision
+                .answerOnMembersRemoteWork(context.activity.text, memberName);
+            if (botMessage) {
+                await context.sendActivity(botMessage);
+            }
+        }
     }
 }
 
