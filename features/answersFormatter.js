@@ -1,4 +1,4 @@
-const { answers } = require('../answers/answers.js');
+const { answers } = require('./messageAnswering/textAnswers/answers.js');
 
 const AnswersFormatter = {
     lookup: function(propertyKey) {

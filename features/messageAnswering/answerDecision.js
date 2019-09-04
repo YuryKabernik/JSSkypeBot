@@ -1,5 +1,5 @@
-const { AnswersFormatter } = require('./answersFormatter.js');
-const keyPhrases = require('../keyPhrases/remoteWorkPhrases.json');
+const { AnswersFormatter } = require('../answersFormatter.js');
+const keyPhrases = require('./keyPhrases/remoteWorkPhrases.json');
 
 class AnswerDecision {
     constructor(botId) {

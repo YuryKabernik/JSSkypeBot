@@ -1,5 +1,5 @@
 const { ActivityHandler } = require('botbuilder');
-const { AnswerDecision } = require('./features/answerDecision.js');
+const { AnswerDecision } = require('./features/messageAnswering/answerDecision.js');
 
 class SkypeBot extends ActivityHandler {
     constructor(botId) {
