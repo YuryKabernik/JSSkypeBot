@@ -1,4 +1,4 @@
-const { ActivityHandler } = require('botbuilder');
+const { ActivityHandler, TurnContext } = require('botbuilder');
 const { AnswerDecision } = require('./features/messageAnswering/answerDecision.js');
 
 class SkypeBot extends ActivityHandler {
@@ -6,10 +6,12 @@ class SkypeBot extends ActivityHandler {
         super();
         this.botId = botId;
         this.answerDecision = new AnswerDecision(botId);
+        this.conversationReferences = {};
         this._assignOnMembersAdded();
         this._assignOnMessageAction();
         this._assignOnTurnAction();
         this._assignOnMembersRemovedAction();
+        this._assignConversationReference();
     }
 
     _assignOnMessageAction() {
@@ -26,6 +28,13 @@ class SkypeBot extends ActivityHandler {
             if (context.activity.conversation.isGroup) {
                 await this.answerOnRemoteWorkMessage(context);
             }
+            await next();
+        });
+    }
+
+    _assignConversationReference() {
+        this.onConversationUpdate(async (context, next) => {
+            await this.addConversationReference(context.activity);
             await next();
         });
     }
@@ -73,6 +82,15 @@ class SkypeBot extends ActivityHandler {
             if (botMessage) {
                 await context.sendActivity(botMessage);
             }
+        }
+    }
+
+    async addConversationReference(activity) {
+        const conversationReference = TurnContext.getConversationReference(activity);
+        const conversationId = conversationReference.conversation.id;
+        const conversationIds = Object.keys(this.conversationReferences);
+        if (conversationIds.includes(conversationId)) {
+            this.conversationReferences[conversationId] = conversationReference;
         }
     }
 }
