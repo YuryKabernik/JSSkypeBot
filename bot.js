@@ -1,12 +1,14 @@
 const { ActivityHandler, TurnContext } = require('botbuilder');
 const { AnswerDecision } = require('./features/messageAnswering/answerDecision.js');
+const { Сongratulator } = require('./features/proactiveMessaging/birthdayCongratulation/congratulator.js');
+const { birthDates } = require('./features/proactiveMessaging/birthdayCongratulation/birthdayDates.js');
 
 class SkypeBot extends ActivityHandler {
     constructor(botId) {
         super();
         this.botId = botId;
         this.answerDecision = new AnswerDecision(botId);
-        this.conversationReferences = {};
+        this.congratulator = new Сongratulator(birthDates);
         this._assignOnMembersAdded();
         this._assignOnMessageAction();
         this._assignOnTurnAction();
@@ -34,7 +36,8 @@ class SkypeBot extends ActivityHandler {
 
     _assignConversationReference() {
         this.onConversationUpdate(async (context, next) => {
-            await this.addConversationReference(context.activity);
+            const conversationReference = TurnContext.getConversationReference(context.activity);
+            this.congratulator.addConversationReference(conversationReference);
             await next();
         });
     }
@@ -82,15 +85,6 @@ class SkypeBot extends ActivityHandler {
             if (botMessage) {
                 await context.sendActivity(botMessage);
             }
-        }
-    }
-
-    async addConversationReference(activity) {
-        const conversationReference = TurnContext.getConversationReference(activity);
-        const conversationId = conversationReference.conversation.id;
-        const conversationIds = Object.keys(this.conversationReferences);
-        if (conversationIds.includes(conversationId)) {
-            this.conversationReferences[conversationId] = conversationReference;
         }
     }
 }

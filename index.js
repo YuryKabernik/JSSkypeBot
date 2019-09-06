@@ -49,12 +49,8 @@ server.post('/api/messages', (req, res) => {
 });
 
 // Listen for incoming notifications and send proactive messages to users.
-server.get('/api/notify', async (req, res) => {
-    for (const conversationReference of Object.values(myBot.conversationReferences)) {
-        await adapter.continueConversation(conversationReference, async turnContext => {
-            await turnContext.sendActivity('proactive hello');
-        });
-    }
+server.get('/api/notify/congradulations', (req, res) => {
+    myBot.congratulator.sheduleCongradulation(adapter.continueConversation);
 
     res.setHeader('Content-Type', 'text/html');
     res.writeHead(200);
