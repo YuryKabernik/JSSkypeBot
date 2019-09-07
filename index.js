@@ -34,9 +34,6 @@ adapter.onTurnError = async (context, error) => {
     await context.sendActivity(`Oops. Something went wrong!`); // Send a message to the user
 };
 
-// To-Do: Add proactive message on the first bot appearanse.
-// adapter.continueConversation('', (context) => context.);
-
 // Create the main dialog.
 const myBot = new SkypeBot();
 
@@ -50,7 +47,7 @@ server.post('/api/messages', (req, res) => {
 
 // Listen for incoming notifications and send proactive messages to users.
 server.get('/api/notify/congradulations', (req, res) => {
-    myBot.congratulator.sheduleCongradulation(adapter.continueConversation);
+    myBot.congratulator.shedule(adapter.continueConversation);
 
     res.setHeader('Content-Type', 'text/html');
     res.writeHead(200);

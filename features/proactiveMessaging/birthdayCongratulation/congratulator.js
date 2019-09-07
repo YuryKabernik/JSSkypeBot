@@ -8,7 +8,7 @@ class Сongratulator {
         this.sheduledCongradulations = [];
     }
 
-    sheduleCongradulation(sendEventCallback) {
+    shedule(sendEventCallback) {
         for (const conversationReference of Object.values(this.conversationReferences)) {
             const congradulatinGroupExists =
                 conversationReference.conversation.name &&
@@ -16,23 +16,27 @@ class Сongratulator {
                 this.birthDates[conversationReference.conversation.name];
 
             if (congradulatinGroupExists) {
-                const birthDates = this.birthDates[conversationReference.conversation.name] || [];
-                birthDates.forEach(bDate => {
-                    const dateExpression = `* * * ${ bDate.date.getDay() } ${ bDate.date.getMonth() }`;
-                    const sheduledCongradulation = cron.schedule(dateExpression, () => {
-                        sendEventCallback(conversationReference, async turnContext => {
-                            await turnContext.sendActivity(`С днём рождения, <at>${ bDate.name }</at>!`);
-                        });
-                    });
-                    const sheduledEventExists = this.sheduledCongradulations.includes(sheduledCongradulation);
-                    if (sheduledEventExists) {
-                        sheduledCongradulation.destroy();
-                    } else {
-                        this.sheduledCongradulations.push(sheduledCongradulation);
-                    }
-                });
+                this.sheduleBirthdayCongraduloations(conversationReference, sendEventCallback);
             }
         }
+    }
+
+    sheduleBirthdayCongraduloations(conversationReference, sendEventCallback) {
+        const birthDates = this.birthDates[conversationReference.conversation.name];
+        birthDates.forEach(bDate => {
+            const dateExpression = `* * * ${ bDate.date.getDay() } ${ bDate.date.getMonth() }`;
+            const sheduledCongradulation = cron.schedule(dateExpression, () => {
+                sendEventCallback(conversationReference, async (turnContext) => {
+                    await turnContext.sendActivity(`С днём рождения, <at>${ bDate.name }</at>!`);
+                });
+            });
+            const sheduledEventExists = this.sheduledCongradulations.includes(sheduledCongradulation);
+            if (sheduledEventExists) {
+                sheduledCongradulation.destroy();
+            } else {
+                this.sheduledCongradulations.push(sheduledCongradulation);
+            }
+        });
     }
 
     addConversationReference(conversationReference) {
