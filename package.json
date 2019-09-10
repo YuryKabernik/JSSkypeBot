@@ -22,7 +22,8 @@
         "dot-properties": "^0.3.2",
         "dotenv": "~8.0.0",
         "node-cron": "^2.0.3",
-        "restify": "~8.3.3"
+        "restify": "~8.3.3",
+        "uuid": "^3.3.3"
     },
     "devDependencies": {
         "eslint": "^6.0.1",

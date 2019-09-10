@@ -2,13 +2,16 @@ const { ActivityHandler, TurnContext } = require('botbuilder');
 const { AnswerDecision } = require('./features/messageAnswering/answerDecision.js');
 const { Сongratulator } = require('./features/proactiveMessaging/birthdayCongratulation/congratulator.js');
 const { birthDates } = require('./features/proactiveMessaging/birthdayCongratulation/birthdayDates.js');
+const { HolidaySheduler } = require('./features/proactiveMessaging/holidayReminder/holidayScheduler.js');
+const { holidays } = require('./features/proactiveMessaging/holidayReminder/holidays.js');
 
 class SkypeBot extends ActivityHandler {
     constructor(botId) {
         super();
-        this.botId = botId;
+        this.id = botId;
         this.answerDecision = new AnswerDecision(botId);
         this.congratulator = new Сongratulator(birthDates);
+        this.holidays = new HolidaySheduler(holidays);
         this._assignOnMembersAdded();
         this._assignOnMessageAction();
         this._assignOnTurnAction();
@@ -38,6 +41,7 @@ class SkypeBot extends ActivityHandler {
         this.onConversationUpdate(async (context, next) => {
             const conversationReference = TurnContext.getConversationReference(context.activity);
             this.congratulator.addConversationReference(conversationReference);
+            this.holidays.addConversationReference(conversationReference);
             await next();
         });
     }
@@ -51,7 +55,7 @@ class SkypeBot extends ActivityHandler {
                 const goodbyMessage = this.answerDecision.answerToRemovedMember(
                     memberId,
                     memberName,
-                    this.botId
+                    this.id
                 );
                 if (goodbyMessage) {
                     await context.sendActivity(goodbyMessage);
@@ -67,7 +71,7 @@ class SkypeBot extends ActivityHandler {
             for (let cnt = 0; cnt < membersAdded.length; ++cnt) {
                 const welcomMessage = this.answerDecision.answerToNewMember(
                     membersAdded[cnt].id,
-                    this.botId
+                    this.id
                 );
                 if (welcomMessage) {
                     await context.sendActivity(welcomMessage);

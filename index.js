@@ -35,19 +35,20 @@ adapter.onTurnError = async (context, error) => {
 };
 
 // Create the main dialog.
-const myBot = new SkypeBot();
+const skypeBot = new SkypeBot();
 
 // Listen for incoming requests.
 server.post('/api/messages', (req, res) => {
     adapter.processActivity(req, res, async (context) => {
-        myBot.botId = context.activity.recipient.id;
-        await myBot.run(context);
+        skypeBot.id = context.activity.recipient.id;
+        await skypeBot.run(context);
     });
 });
 
 // Listen for incoming notifications and send proactive messages to users.
-server.get('/api/notify/congradulations', (req, res) => {
-    myBot.congratulator.shedule(adapter.continueConversation);
+server.get('/api/notify/shedule', (req, res) => {
+    skypeBot.congratulator.shedule((conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback));
+    skypeBot.holidays.shedule((conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback));
 
     res.setHeader('Content-Type', 'text/html');
     res.writeHead(200);
