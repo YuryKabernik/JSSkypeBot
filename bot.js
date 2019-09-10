@@ -1,7 +1,7 @@
 const { ActivityHandler, TurnContext } = require('botbuilder');
 const { AnswerDecision } = require('./features/messageAnswering/answerDecision.js');
 const { Сongratulator } = require('./features/proactiveMessaging/birthdayCongratulation/congratulator.js');
-const { birthDates } = require('./features/proactiveMessaging/birthdayCongratulation/birthdayDates.js');
+const { birthdayDates } = require('./features/proactiveMessaging/birthdayCongratulation/birthdayDates.js');
 const { HolidaySheduler } = require('./features/proactiveMessaging/holidayReminder/holidayScheduler.js');
 const { holidays } = require('./features/proactiveMessaging/holidayReminder/holidays.js');
 
@@ -10,7 +10,7 @@ class SkypeBot extends ActivityHandler {
         super();
         this.id = botId;
         this.answerDecision = new AnswerDecision(botId);
-        this.congratulator = new Сongratulator(birthDates);
+        this.congratulator = new Сongratulator(birthdayDates);
         this.holidays = new HolidaySheduler(holidays);
         this._assignOnMembersAdded();
         this._assignOnMessageAction();

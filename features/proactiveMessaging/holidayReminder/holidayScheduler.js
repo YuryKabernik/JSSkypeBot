@@ -22,10 +22,6 @@ class HolidaySheduler {
         ];
     }
 
-    containsKey(conversationName) {
-        return !!this.holidays[conversationName];
-    }
-
     shedule(sendEventCallback) {
         for (const conversationReference of Object.values(this.conversationReferences)) {
             this.sheduleHolidaysCongraduloations(conversationReference, sendEventCallback);
