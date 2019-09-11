@@ -54,6 +54,9 @@ class Сongratulator {
                 sendEventCallback(conversationReference, async (turnContext) => {
                     await turnContext.sendActivity(`С днём рождения, <at>${ birthdayDate.name }</at>!`);
                 });
+            },
+            {
+                timezone: process.env.Timezone
             });
             const sheduledEventExists = this.sheduledCongradulations.map(task => task.taskId).includes(taskId);
             if (sheduledEventExists) {
