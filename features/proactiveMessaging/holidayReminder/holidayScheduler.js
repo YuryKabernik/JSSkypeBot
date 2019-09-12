@@ -4,7 +4,7 @@ const uuid = require('uuid/v5');
 class HolidaySheduler {
     constructor(holidays) {
         this.holidays = holidays;
-        this.conversationReferences = [];
+        this.conversationReferences = {};
         this.sheduledCongradulations = [];
         this.months = [
             'January',

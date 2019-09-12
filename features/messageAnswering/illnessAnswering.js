@@ -2,7 +2,8 @@ const { AnswersFormatter } = require('../answersFormatter.js');
 const keyPhrases = require('./keyPhrases/gotSickToday.json');
 
 class IllnessAnswering {
-    getAnswerMessage(message) {
+    getAnswerMessage(message = '') {
+        message = message.toLowerCase();
         if (keyPhrases.sickToday.some(keyPhrase => message.includes(keyPhrase))) {
             return AnswersFormatter.lookup('getWellOnSickToday');
         }
@@ -15,17 +16,17 @@ class IllnessAnswering {
         if (keyPhrases.halfDaySickLeave.some(keyPhrase => message.includes(keyPhrase))) {
             return AnswersFormatter.lookup('getWellOnHalfDaySickLeave');
         }
-        return AnswersFormatter.lookup('getWellOnSickToday');
+        return '';
     }
 
-    isContainsIllnessPhrase(message) {
+    isContainsIllnessPhrase(message = '') {
         message = message.toLowerCase();
         const sickPhraseGroups = Object.keys(keyPhrases);
         const remoteWorkPhrases = sickPhraseGroups.reduce(
             (result, key) => result.concat(keyPhrases[key]),
             []
         ).map(phrase => phrase.toLowerCase());
-        return remoteWorkPhrases.find(keyPhrase => message.includes(keyPhrase));
+        return remoteWorkPhrases.some(keyPhrase => message.includes(keyPhrase));
     }
 }
 
