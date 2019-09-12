@@ -1,5 +1,6 @@
 const { ActivityHandler, TurnContext } = require('botbuilder');
 const { AnswerDecision } = require('./features/messageAnswering/answerDecision.js');
+const { IllnessAnswering } = require('./features/messageAnswering/illnessAnswering.js');
 const { Сongratulator } = require('./features/proactiveMessaging/birthdayCongratulation/congratulator.js');
 const { birthdayDates } = require('./features/proactiveMessaging/birthdayCongratulation/birthdayDates.js');
 const { HolidaySheduler } = require('./features/proactiveMessaging/holidayReminder/holidayScheduler.js');
@@ -10,6 +11,7 @@ class SkypeBot extends ActivityHandler {
         super();
         this.id = botId;
         this.answerDecision = new AnswerDecision(botId);
+        this.illnessAnswering = new IllnessAnswering(botId);
         this.congratulator = new Сongratulator(birthdayDates);
         this.holidays = new HolidaySheduler(holidays);
         this._assignOnMembersAdded();
@@ -31,7 +33,11 @@ class SkypeBot extends ActivityHandler {
     _assignOnTurnAction() {
         this.onTurn(async (context, next) => {
             if (context.activity.conversation.isGroup) {
-                await this.answerOnRemoteWorkMessage(context);
+                if (this.illnessAnswering.isContainsIllnessPhrase(context.activity.text)) {
+                    await this.answerOnSickLeaveMessage(context);
+                } else {
+                    await this.answerOnRemoteWorkMessage(context);
+                }
             }
             await next();
         });
@@ -86,6 +92,17 @@ class SkypeBot extends ActivityHandler {
             const memberName = context.activity.from.name;
             const botMessage = this.answerDecision
                 .answerOnMembersRemoteWork(context.activity.text, memberName);
+            if (botMessage) {
+                await context.sendActivity(botMessage);
+            }
+        }
+    }
+
+    async answerOnSickLeaveMessage(context) {
+        if (context.activity.text) {
+            const memberName = context.activity.from.name;
+            const botMessage = this.illnessAnswering
+                .getAnswerMessage(context.activity.text, memberName);
             if (botMessage) {
                 await context.sendActivity(botMessage);
             }
