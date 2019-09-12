@@ -7,10 +7,11 @@ class AnswerDecision {
     }
 
     answerOnMembersRemoteWork(message, userName) {
+        message = message.toLowerCase();
         const remoteWorkPhrases = keyPhrases.continueRemoteWork.concat(
             keyPhrases.startRemoteWork,
             keyPhrases.commonRemoteWork
-        );
+        ).map(phrase => phrase.toLowerCase());
         if (remoteWorkPhrases.some(keyPhrase => message.includes(keyPhrase))) {
             return AnswersFormatter.format('doNotDenyYourselfAnything', { name: userName });
         }
