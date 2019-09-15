@@ -15,6 +15,10 @@ dotenv.config({ path: ENV_FILE });
 
 // Create HTTP server
 const server = restify.createServer();
+
+server.use(restify.plugins.acceptParser(server.acceptable));
+server.use(restify.plugins.bodyParser({ mapParams: false }));
+
 server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log(`\n${ server.name } listening to ${ server.url }`);
     console.log(`\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator`);
@@ -46,7 +50,8 @@ server.post('/api/messages', async (req, res) => {
 });
 
 // Listen for incomming information about new iterations notification
-server.post('/api/notify/iterations', async (req, res) => {
+server.post('/api/notify/iterations', (req, res) => {
+    res.setHeader('Content-Type', 'text/html');
     try {
         let iterations = [];
         if (req.body && typeof req.body === 'object') {
@@ -60,28 +65,26 @@ server.post('/api/notify/iterations', async (req, res) => {
             (conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback)
         );
     } catch (error) {
-        res.write('<html><body><h1>Unable to handle your request. Is your request body correct?</h1></body></html>');
-        res.writeHead(500);
-        res.end();
-        return;
+        sendResponse(res, 500, 'Unable to handle your request. Is your request body correct?');
+        throw error;
     }
-    res.setHeader('Content-Type', 'text/html');
-    res.write('<html><body><h1>New Iterations have been sheduled!</h1></body></html>');
-    res.writeHead(200);
-    res.end();
+    sendResponse(res, 200, 'New Iterations have been sheduled!');
 });
 
 // Listen for incoming notifications and send proactive messages to users.
 server.get('/api/notify/shedule', async (req, res) => {
-    skypeBot.congratulator.shedule(
-        (conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback)
-    );
-    skypeBot.holidays.shedule(
-        (conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback)
-    );
+    const sendEventCallback = (conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback);
+    skypeBot.congratulator.shedule(sendEventCallback);
+    skypeBot.holidays.shedule(sendEventCallback);
 
     res.setHeader('Content-Type', 'text/html');
     res.writeHead(200);
     res.write('<html><body><h1>Proactive messages have been seted.</h1></body></html>');
     res.end();
 });
+
+function sendResponse(res, statusCode, errMessage) {
+    res.writeHead(statusCode);
+    res.write(`<html><body><h1>${ errMessage }</h1></body></html>`);
+    res.end();
+}
