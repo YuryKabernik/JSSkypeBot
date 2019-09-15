@@ -1,6 +1,6 @@
 const { AnswersFormatter } = require('../answersFormatter.js');
 const keyPhrases = require('./keyPhrases/remoteWorkPhrases.json');
-const { answers } = require('./messageAnswering/textAnswers/answers.js');
+const { answers } = require('./textAnswers/answers.js');
 
 class AnswerDecision {
     constructor(botId) {

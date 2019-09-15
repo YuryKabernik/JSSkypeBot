@@ -1,20 +1,25 @@
 const { AnswersFormatter } = require('../answersFormatter.js');
-const keyPhrases = require('./keyPhrases/gotSickToday.json');
+const keyPhrases = require('./keyPhrases/remoteWorkPhrases.json');
+const { answers } = require('./textAnswers/answers.js');
 
 class IllnessAnswering {
+    constructor() {
+        this.answersFormatter = new AnswersFormatter(answers);
+    }
+
     getAnswerMessage(message = '') {
         message = message.toLowerCase();
         if (keyPhrases.sickToday.some(keyPhrase => message.includes(keyPhrase))) {
-            return AnswersFormatter.lookup('getWellOnSickToday');
+            return this.answersFormatter.lookup('getWellOnSickToday');
         }
         if (keyPhrases.sickLeaveToday.some(keyPhrase => message.includes(keyPhrase))) {
-            return AnswersFormatter.lookup('getWellOnSickLeaveToday');
+            return this.answersFormatter.lookup('getWellOnSickLeaveToday');
         }
         if (keyPhrases.sickLeaveTomorrow.some(keyPhrase => message.includes(keyPhrase))) {
-            return AnswersFormatter.lookup('getWellOnSickLeaveTomorrow');
+            return this.answersFormatter.lookup('getWellOnSickLeaveTomorrow');
         }
         if (keyPhrases.halfDaySickLeave.some(keyPhrase => message.includes(keyPhrase))) {
-            return AnswersFormatter.lookup('getWellOnHalfDaySickLeave');
+            return this.answersFormatter.lookup('getWellOnHalfDaySickLeave');
         }
         return '';
     }
