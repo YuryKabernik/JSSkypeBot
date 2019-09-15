@@ -1,3 +1,4 @@
+const monthList = require('../../../common/months.json');
 const cron = require('node-cron');
 const uuid = require('uuid/v5');
 
@@ -6,20 +7,7 @@ class Сongratulator {
         this.birthDates = birthDates;
         this.conversationReferences = {};
         this.sheduledCongradulations = [];
-        this.months = [
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
-            'June',
-            'July',
-            'August',
-            'September',
-            'October',
-            'November',
-            'December'
-        ];
+        this.months = monthList;
     }
 
     containsKey(conversationName) {

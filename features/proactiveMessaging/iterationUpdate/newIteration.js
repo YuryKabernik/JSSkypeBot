@@ -1,5 +1,6 @@
 const cron = require('node-cron');
 const uuid = require('uuid/v5');
+const monthList = require('../../../common/months.json');
 const { AnswersFormatter } = require('../../answersFormatter.js');
 const { answers } = require('../messageProperties/answers.js');
 
@@ -12,7 +13,7 @@ class NewIteration {
     }
 
     addIterations(iterations = []) {
-        this.iterations.push(iterations);
+        this.iterations = this.iterations.concat(iterations);
     }
 
     shedule(sendEventCallback) {
@@ -45,8 +46,9 @@ class NewIteration {
     }
 
     generateDateExpression(iteration) {
+        const allMonth = monthList;
         const date = new Date(iteration.date);
-        const month = this.months[date.getMonth()];
+        const month = allMonth[date.getMonth()];
         const dateDay = date.getDate();
         const hours = date.getHours();
         const minutes = date.getMinutes();
