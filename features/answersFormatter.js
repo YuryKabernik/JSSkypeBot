@@ -1,12 +1,15 @@
-const { answers } = require('./messageAnswering/textAnswers/answers.js');
+class AnswersFormatter {
+    constructor(initialAnswers) {
+        this.answers = initialAnswers;
+    }
 
-const AnswersFormatter = {
-    lookup: function(propertyKey) {
-        return (propertyKey && typeof propertyKey) === 'string' ? answers[propertyKey] : '';
-    },
-    format: function(propertyKey, data = {}) {
+    lookup(propertyKey) {
+        return (propertyKey && typeof propertyKey) === 'string' ? this.answers[propertyKey] : '';
+    }
+
+    format(propertyKey, data = {}) {
         if (propertyKey && typeof propertyKey === 'string') {
-            let answer = answers[propertyKey] || '';
+            let answer = this.answers[propertyKey] || '';
             const propNames = Object.getOwnPropertyNames(data);
             propNames.forEach(name => {
                 const whatToReplace = `{${ name }}`;

@@ -1,9 +1,11 @@
 const { AnswersFormatter } = require('../answersFormatter.js');
 const keyPhrases = require('./keyPhrases/remoteWorkPhrases.json');
+const { answers } = require('./messageAnswering/textAnswers/answers.js');
 
 class AnswerDecision {
     constructor(botId) {
         this.botId = botId;
+        this.answersFormatter = new AnswersFormatter(answers);
     }
 
     answerOnMembersRemoteWork(message, userName) {
@@ -13,20 +15,20 @@ class AnswerDecision {
             keyPhrases.commonRemoteWork
         ).map(phrase => phrase.toLowerCase());
         if (remoteWorkPhrases.some(keyPhrase => message.includes(keyPhrase))) {
-            return AnswersFormatter.format('doNotDenyYourselfAnything', { name: userName });
+            return this.answersFormatter.format('doNotDenyYourselfAnything', { name: userName });
         }
     }
 
     answerToRemovedMember(removedMemberId, removedMemberName, botId) {
         return removedMemberId !== (this.botId || botId) ?
-            AnswersFormatter.format('goodbyeToTheUser', { name: removedMemberName }) :
-            AnswersFormatter.lookup('botRemoveLastWords');
+            this.answersFormatter.format('goodbyeToTheUser', { name: removedMemberName }) :
+            this.answersFormatter.lookup('botRemoveLastWords');
     }
 
     answerToNewMember(newMemberId, botId) {
         return newMemberId !== (this.botId || botId) ?
-            `${ AnswersFormatter.lookup('welcomToTheWLNTeam') } ${ AnswersFormatter.lookup('teamIntroduction') }` :
-            AnswersFormatter.lookup('botIntroductionSerious');
+            `${ this.answersFormatter.lookup('welcomToTheWLNTeam') } ${ this.answersFormatter.lookup('teamIntroduction') }` :
+            this.answersFormatter.lookup('botIntroductionSerious');
     }
 }
 
