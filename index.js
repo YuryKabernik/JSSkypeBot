@@ -38,20 +38,50 @@ adapter.onTurnError = async (context, error) => {
 const skypeBot = new SkypeBot();
 
 // Listen for incoming requests.
-server.post('/api/messages', (req, res) => {
+server.post('/api/messages', async (req, res) => {
     adapter.processActivity(req, res, async (context) => {
         skypeBot.id = context.activity.recipient.id;
         await skypeBot.run(context);
     });
 });
 
+// Listen for incomming information about new iterations notification
+server.post('/api/notify/iterations', async (req, res) => {
+    try {
+        let iterations = [];
+        if (req.body && typeof req.body === 'object') {
+            iterations = req.body.iterations;
+        } else if (req.body) {
+            req.body = JSON.parse(req.body);
+            iterations = req.body.iterations;
+        }
+        skypeBot.iterationsNotification.addIterations(iterations);
+        skypeBot.iterationsNotification.shedule(
+            (conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback)
+        );
+    } catch (error) {
+        res.write('<html><body><h1>Unable to handle your request. Is your request body correct?</h1></body></html>');
+        res.writeHead(500);
+        res.end();
+        return;
+    }
+    res.setHeader('Content-Type', 'text/html');
+    res.write('<html><body><h1>New Iterations have been sheduled!</h1></body></html>');
+    res.writeHead(200);
+    res.end();
+});
+
 // Listen for incoming notifications and send proactive messages to users.
-server.get('/api/notify/shedule', (req, res) => {
-    skypeBot.congratulator.shedule((conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback));
-    skypeBot.holidays.shedule((conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback));
+server.get('/api/notify/shedule', async (req, res) => {
+    skypeBot.congratulator.shedule(
+        (conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback)
+    );
+    skypeBot.holidays.shedule(
+        (conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback)
+    );
 
     res.setHeader('Content-Type', 'text/html');
     res.writeHead(200);
-    res.write('<html><body><h1>Proactive messages have been sent.</h1></body></html>');
+    res.write('<html><body><h1>Proactive messages have been seted.</h1></body></html>');
     res.end();
 });
