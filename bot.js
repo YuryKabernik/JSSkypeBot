@@ -5,15 +5,17 @@ const { Сongratulator } = require('./features/proactiveMessaging/birthdayCongra
 const { birthdayDates } = require('./features/proactiveMessaging/birthdayCongratulation/birthdayDates.js');
 const { HolidaySheduler } = require('./features/proactiveMessaging/holidayReminder/holidayScheduler.js');
 const { holidays } = require('./features/proactiveMessaging/holidayReminder/holidays.js');
+const { NewIteration } = require('./features/proactiveMessaging/iterationUpdate/newIteration.js');
 
 class SkypeBot extends ActivityHandler {
     constructor(botId) {
         super();
         this.id = botId;
+        this.holidays = new HolidaySheduler(holidays);
         this.answerDecision = new AnswerDecision(botId);
+        this.iterationsNotification = new NewIteration();
         this.illnessAnswering = new IllnessAnswering(botId);
         this.congratulator = new Сongratulator(birthdayDates);
-        this.holidays = new HolidaySheduler(holidays);
         this._assignOnMembersAdded();
         this._assignOnMessageAction();
         this._assignOnTurnAction();
@@ -46,6 +48,7 @@ class SkypeBot extends ActivityHandler {
     _assignConversationReference() {
         this.onConversationUpdate(async (context, next) => {
             const conversationReference = TurnContext.getConversationReference(context.activity);
+            this.iterationsNotification.addConversationReference(conversationReference);
             this.congratulator.addConversationReference(conversationReference);
             this.holidays.addConversationReference(conversationReference);
             await next();
