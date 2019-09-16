@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const uuid = require('uuid/v5');
-const monthList = require('../../../common/months.json');
+const { generateCronDateExpression } = require('../utils/generateCronDateExpression.js');
 const { AnswersFormatter } = require('../../answersFormatter.js');
 const { answers } = require('../messageProperties/answers.js');
 
@@ -24,7 +24,7 @@ class NewIteration {
 
     sheduleNewIterationsNotification(conversationReference, sendEventCallback) {
         this.iterations.forEach(iteration => {
-            const dateExpression = this.generateDateExpression(iteration);
+            const dateExpression = generateCronDateExpression(iteration);
             const taskId = uuid(dateExpression + iteration.name, process.env.MicrosoftAppId);
             const sheduledCongradulation = cron.schedule(dateExpression, () => {
                 sendEventCallback(conversationReference, async (turnContext) => {
@@ -43,18 +43,6 @@ class NewIteration {
                 this.sheduledIterationNotifications.push({ taskId, sheduledCongradulation });
             }
         });
-    }
-
-    generateDateExpression(iteration) {
-        const allMonth = monthList;
-        const date = new Date(iteration.date);
-        const month = allMonth[date.getMonth()];
-        const dateDay = date.getDate();
-        const hours = date.getHours();
-        const minutes = date.getMinutes();
-        const seconds = date.getSeconds();
-        const dateExpression = `${ seconds } ${ minutes } ${ hours } ${ dateDay } ${ month } *`;
-        return dateExpression;
     }
 
     addConversationReference(conversationReference) {

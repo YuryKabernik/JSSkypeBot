@@ -42,7 +42,7 @@ adapter.onTurnError = async (context, error) => {
 const skypeBot = new SkypeBot();
 
 // Listen for incoming requests.
-server.post('/api/messages', async (req, res) => {
+server.post('/api/messages', (req, res) => {
     adapter.processActivity(req, res, async (context) => {
         skypeBot.id = context.activity.recipient.id;
         await skypeBot.run(context);
@@ -61,9 +61,6 @@ server.post('/api/notify/iterations', (req, res) => {
             iterations = req.body.iterations;
         }
         skypeBot.iterationsNotification.addIterations(iterations);
-        skypeBot.iterationsNotification.shedule(
-            (conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback)
-        );
     } catch (error) {
         sendResponse(res, 500, 'Unable to handle your request. Is your request body correct?');
         throw error;
@@ -72,10 +69,11 @@ server.post('/api/notify/iterations', (req, res) => {
 });
 
 // Listen for incoming notifications and send proactive messages to users.
-server.get('/api/notify/shedule', async (req, res) => {
+server.get('/api/notify/shedule', (req, res) => {
     const sendEventCallback = (conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback);
     skypeBot.congratulator.shedule(sendEventCallback);
     skypeBot.holidays.shedule(sendEventCallback);
+    skypeBot.iterationsNotification.shedule(sendEventCallback);
 
     res.setHeader('Content-Type', 'text/html');
     res.writeHead(200);
