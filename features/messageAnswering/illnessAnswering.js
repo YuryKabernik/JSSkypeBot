@@ -1,5 +1,5 @@
 const { AnswersFormatter } = require('../answersFormatter.js');
-const keyPhrases = require('./keyPhrases/remoteWorkPhrases.json');
+const keyPhrases = require('./keyPhrases/gotSickToday.json');
 const { answers } = require('./textAnswers/answers.js');
 
 class IllnessAnswering {
