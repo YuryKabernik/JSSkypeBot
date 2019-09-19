@@ -1,6 +1,7 @@
 const dotenv = require('dotenv');
 const path = require('path');
 const restify = require('restify');
+const { Logger } = require('./common/logger.js');
 
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
@@ -40,6 +41,7 @@ adapter.onTurnError = async (context, error) => {
 
 // Create the main dialog.
 const skypeBot = new SkypeBot();
+const logger = new Logger('index');
 
 // Listen for incoming requests.
 server.post('/api/messages', (req, res) => {
@@ -51,7 +53,7 @@ server.post('/api/messages', (req, res) => {
 
 // Listen for incomming information about new iterations notification
 server.post('/api/notify/iterations', (req, res) => {
-    res.setHeader('Content-Type', 'text/html');
+    logger.logInfo(`New iterations income ${ JSON.stringify(req.body) }`);
     try {
         let iterations = [];
         if (req.body && typeof req.body === 'object') {
@@ -75,13 +77,11 @@ server.get('/api/notify/shedule', (req, res) => {
     skypeBot.holidays.shedule(sendEventCallback);
     skypeBot.iterationsNotification.shedule(sendEventCallback);
 
-    res.setHeader('Content-Type', 'text/html');
-    res.writeHead(200);
-    res.write('<html><body><h1>Proactive messages have been seted.</h1></body></html>');
-    res.end();
+    sendResponse(res, 200, 'Proactive messages has been setted.');
 });
 
 function sendResponse(res, statusCode, errMessage) {
+    res.setHeader('Content-Type', 'text/html');
     res.writeHead(statusCode);
     res.write(`<html><body><h1>${ errMessage }</h1></body></html>`);
     res.end();

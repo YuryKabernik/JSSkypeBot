@@ -3,6 +3,7 @@ const uuid = require('uuid/v5');
 const { generateCronDateExpression } = require('../utils/generateCronDateExpression.js');
 const { AnswersFormatter } = require('../../answersFormatter.js');
 const { answers } = require('../messageProperties/answers.js');
+const { Logger } = require('../../../common/logger.js');
 
 class NewIteration {
     constructor() {
@@ -10,14 +11,17 @@ class NewIteration {
         this.conversationReferences = {};
         this.sheduledIterationNotifications = [];
         this.answersFormatter = new AnswersFormatter(answers);
+        this.logger = new Logger('NewIteration');
     }
 
     addIterations(iterations = []) {
+        this.logger.logInfo(`Add iterations ${ iterations.map(i => JSON.stringify(i)).join('+') }`);
         this.iterations = this.iterations.concat(iterations);
     }
 
     shedule(sendEventCallback) {
         for (const conversationReference of Object.values(this.conversationReferences)) {
+            this.logger.logInfo(`Sheduled event on conversationReference:[${ JSON.stringify(conversationReference) }]`);
             this.sheduleNewIterationsNotification(conversationReference, sendEventCallback);
         }
     }
@@ -38,8 +42,10 @@ class NewIteration {
 
             const sheduledEventExists = this.sheduledIterationNotifications.map(task => task.taskId).includes(taskId);
             if (sheduledEventExists) {
+                this.logger.logInfo(`Sheduled event already exists: CRON-DATE-TIME:[${ dateExpression }]`);
                 sheduledCongradulation.destroy();
             } else {
+                this.logger.logInfo(`New event sheduled: CRON-DATE-TIME:[${ dateExpression }]`);
                 this.sheduledIterationNotifications.push({ taskId, sheduledCongradulation });
             }
         });
@@ -49,7 +55,10 @@ class NewIteration {
         const conversationId = conversationReference.conversation.id;
         const conversationIds = Object.keys(this.conversationReferences);
         if (!conversationIds.includes(conversationId)) {
+            this.logger.logInfo(`New conversation registred: ${ conversationId }`);
             this.conversationReferences[conversationId] = conversationReference;
+        } else {
+            this.logger.logInfo(`Conversation already registred: ${ conversationId }`);
         }
     }
 }
