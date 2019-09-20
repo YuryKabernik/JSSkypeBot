@@ -34,6 +34,8 @@ class NewIteration {
                 sendEventCallback(conversationReference, async (turnContext) => {
                     const message = this.answersFormatter.format('transferItemsToIteration', { name: iteration.name });
                     await turnContext.sendActivity(message);
+                    this._removeSheduledCongradulation(taskId, sheduledCongradulation);
+                    this._removeIteration(iteration);
                 });
             },
             {
@@ -60,6 +62,19 @@ class NewIteration {
         } else {
             this.logger.logInfo(`Conversation already registred: ${ conversationId }`);
         }
+    }
+
+    _removeSheduledCongradulation(taskId, sheduledCongradulation) {
+        sheduledCongradulation.destroy();
+        const indexOfConfiguration = this.sheduledIterationNotifications.findIndex(notification => notification.taskId === taskId);
+        if (indexOfConfiguration !== -1) {
+            this.sheduledIterationNotifications.splice(indexOfConfiguration, 1);
+        }
+    }
+
+    _removeIteration(iteration) {
+        const indexOfIteration = this.iterations.indexOf(iteration);
+        this.iterations.splice(indexOfIteration, 1);
     }
 }
 
