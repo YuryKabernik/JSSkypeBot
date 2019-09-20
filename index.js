@@ -1,7 +1,7 @@
 const dotenv = require('dotenv');
 const path = require('path');
 const restify = require('restify');
-const { Logger } = require('./common/logger.js');
+const { registerTypes } = require('./configuration/registerTypes.js');
 
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
@@ -39,9 +39,11 @@ adapter.onTurnError = async (context, error) => {
     await context.sendActivity(`Oops. Something went wrong!`); // Send a message to the user
 };
 
+const injecType = registerTypes();
+
 // Create the main dialog.
 const skypeBot = new SkypeBot();
-const logger = new Logger('index');
+const logger = injecType('Common.Logger', __filename);
 
 // Listen for incoming requests.
 server.post('/api/messages', (req, res) => {
