@@ -1,21 +1,17 @@
 const { ActivityHandler, TurnContext } = require('botbuilder');
-const { AnswerDecision } = require('./features/messageAnswering/answerDecision.js');
-const { IllnessAnswering } = require('./features/messageAnswering/illnessAnswering.js');
-const { Сongratulator } = require('./features/proactiveMessaging/birthdayCongratulation/congratulator.js');
 const { birthdayDates } = require('./features/proactiveMessaging/birthdayCongratulation/birthdayDates.js');
-const { HolidaySheduler } = require('./features/proactiveMessaging/holidayReminder/holidayScheduler.js');
 const { holidays } = require('./features/proactiveMessaging/holidayReminder/holidays.js');
-const { NewIteration } = require('./features/proactiveMessaging/iterationUpdate/newIteration.js');
+const Injection = require('./configuration/registerTypes.js');
 
 class SkypeBot extends ActivityHandler {
     constructor(botId) {
         super();
         this.id = botId;
-        this.holidays = new HolidaySheduler(holidays);
-        this.answerDecision = new AnswerDecision(botId);
-        this.iterationsNotification = new NewIteration();
-        this.illnessAnswering = new IllnessAnswering(botId);
-        this.congratulator = new Сongratulator(birthdayDates);
+        this.holidays = Injection.getInstance('SkypeBot.HolidaySheduler', holidays);
+        this.answerDecision = Injection.getInstance('SkypeBot.TextAnswers', botId);
+        this.iterationsNotification = Injection.getInstance('SkypeBot.NewIteration');
+        this.illnessAnswering = Injection.getInstance('SkypeBot.IllnessAnswering', botId);
+        this.congratulator = Injection.getInstance('SkypeBot.Сongratulator', birthdayDates);
         this._assignOnMembersAdded();
         this._assignOnMessageAction();
         this._assignOnTurnAction();

@@ -7,9 +7,6 @@ const { registerTypes } = require('./configuration/registerTypes.js');
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
 const { BotFrameworkAdapter } = require('botbuilder');
 
-// This bot's main dialog.
-const { SkypeBot } = require('./bot');
-
 // Import required bot configuration.
 const ENV_FILE = path.join(__dirname, '.env');
 dotenv.config({ path: ENV_FILE });
@@ -41,8 +38,9 @@ adapter.onTurnError = async (context, error) => {
 
 const injecType = registerTypes();
 
+// This bot's main dialog.
 // Create the main dialog.
-const skypeBot = new SkypeBot();
+const skypeBot = injecType('Common.SkypeBot');
 const logger = injecType('Common.Logger', __filename);
 
 // Listen for incoming requests.
