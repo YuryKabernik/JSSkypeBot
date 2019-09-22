@@ -7,8 +7,8 @@ const { generateCronDateExpression } = require('../utils/generateCronDateExpress
 class NewIteration {
     constructor() {
         this.iterations = [];
-        this.conversationReferences = {};
         this.sheduledIterationNotifications = [];
+        this.conversationReferences = Injection.getInstance('DAL.ReferenceRepository');
         this.answersFormatter = Injection.getInstance('Common.AnswersFormatter', answers);
         this.logger = Injection.getInstance('Common.Logger', __filename);
     }
@@ -19,10 +19,10 @@ class NewIteration {
     }
 
     shedule(sendEventCallback) {
-        for (const conversationReference of Object.values(this.conversationReferences)) {
+        this.conversationReferences.all.forEach(conversationReference => {
             this.logger.logInfo(`Sheduled event on conversationReference:[${ JSON.stringify(conversationReference) }]`);
             this.sheduleNewIterationsNotification(conversationReference, sendEventCallback);
-        }
+        });
     }
 
     sheduleNewIterationsNotification(conversationReference, sendEventCallback) {
@@ -47,17 +47,6 @@ class NewIteration {
                 this.sheduledIterationNotifications.push({ taskId, sheduledCongradulation });
             }
         });
-    }
-
-    addConversationReference(conversationReference) {
-        const conversationId = conversationReference.conversation.id;
-        const conversationIds = Object.keys(this.conversationReferences);
-        if (!conversationIds.includes(conversationId)) {
-            this.logger.logInfo(`New conversation registred: ${ conversationId }`);
-            this.conversationReferences[conversationId] = conversationReference;
-        } else {
-            this.logger.logInfo(`Conversation already registred: ${ conversationId }`);
-        }
     }
 
     _removeSheduledCongradulation(taskId, sheduledCongradulation) {

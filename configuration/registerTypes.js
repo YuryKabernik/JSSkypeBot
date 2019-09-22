@@ -7,6 +7,7 @@ const { AnswerDecision } = require('../features/messageAnswering/answerDecision.
 const { HolidaySheduler } = require('../features/proactiveMessaging/holidayReminder/holidayScheduler.js');
 const { NewIteration } = require('../features/proactiveMessaging/iterationUpdate/newIteration.js');
 const { AnswersFormatter } = require('../features/answersFormatter.js');
+const { ReferenceRepository } = require('../storage/ReferenceRepository.js');
 
 let injector = null;
 
@@ -15,6 +16,8 @@ function registerTypes() {
 
     injector.register('Common.Logger', (...args) => new Logger(...args));
     injector.register('Common.AnswersFormatter', (...args) => new AnswersFormatter(...args));
+
+    injector.register('DAL.ReferenceRepository', new ReferenceRepository());
 
     injector.register('SkypeBot.TextAnswers', (...args) => new AnswerDecision(...args));
     injector.register('SkypeBot.HolidaySheduler', (...args) => new HolidaySheduler(...args));
