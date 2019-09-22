@@ -2,6 +2,7 @@ const cron = require('node-cron');
 const uuid = require('uuid/v5');
 const monthList = require('../../../common/months.json');
 const Injection = require('../../../configuration/registerTypes.js');
+const { generateCronDateExpression } = require('../utils/generateCronDateExpression.js');
 
 class HolidaySheduler {
     constructor(holidays) {
@@ -19,13 +20,7 @@ class HolidaySheduler {
 
     sheduleHolidaysCongraduloations(conversationReference, sendEventCallback) {
         this.holidays.forEach(holidayDate => {
-            const date = new Date(holidayDate.date);
-            const month = this.months[date.getMonth()];
-            const dateDay = date.getDate();
-            const hours = date.getHours();
-            const minutes = date.getMinutes();
-            const seconds = date.getSeconds();
-            const dateExpression = `${ seconds } ${ minutes } ${ hours } ${ dateDay } ${ month } *`;
+            const dateExpression = generateCronDateExpression(holidayDate);
             const taskId = uuid(dateExpression, process.env.MicrosoftAppId);
             const sheduledCongradulation = cron.schedule(dateExpression, () => {
                 sendEventCallback(conversationReference, async (turnContext) => {

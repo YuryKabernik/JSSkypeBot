@@ -1,8 +1,8 @@
 const monthList = require('./months.json');
 
-function generateCronDateExpression(iteration) {
+function generateCronDateExpression(datedObject) {
     const allMonth = monthList;
-    const date = new Date(iteration.date);
+    const date = new Date(datedObject.date);
     const month = allMonth[date.getMonth()];
     const dateDay = date.getDate();
     const hours = date.getHours();

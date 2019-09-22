@@ -2,6 +2,7 @@ const cron = require('node-cron');
 const uuid = require('uuid/v5');
 const monthList = require('../../../common/months.json');
 const Injection = require('../../../configuration/registerTypes.js');
+const { generateCronDateExpression } = require('../utils/generateCronDateExpression.js');
 
 class Сongratulator {
     constructor(birthDates = []) {
@@ -27,13 +28,7 @@ class Сongratulator {
     sheduleBirthdayCongraduloations(conversationReference, sendEventCallback) {
         const birthDates = this.birthDates[conversationReference.conversation.name] || [];
         birthDates.forEach(birthdayDate => {
-            const date = new Date(birthdayDate.date);
-            const month = this.months[date.getMonth()];
-            const dateDay = date.getDate();
-            const hours = date.getHours();
-            const minutes = date.getMinutes();
-            const seconds = date.getSeconds();
-            const dateExpression = `${ seconds } ${ minutes } ${ hours } ${ dateDay } ${ month } *`;
+            const dateExpression = generateCronDateExpression(birthdayDate);
             const taskId = uuid(dateExpression, process.env.MicrosoftAppId);
             const sheduledCongradulation = cron.schedule(dateExpression, () => {
                 sendEventCallback(conversationReference, async (turnContext) => {
@@ -48,15 +43,6 @@ class Сongratulator {
                 this.sheduledCongradulations.push({ taskId, sheduledCongradulation });
             }
         });
-    }
-
-    addConversationReference(conversationReference) {
-        const conversationId = conversationReference.conversation.id;
-        const conversationName = conversationReference.conversation.name;
-        const conversationIds = Object.keys(this.conversationReferences);
-        if (!!this.birthDates[conversationName] && !conversationIds.includes(conversationId)) {
-            this.conversationReferences[conversationId] = conversationReference;
-        }
     }
 }
 
