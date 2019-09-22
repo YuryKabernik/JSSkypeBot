@@ -1,17 +1,16 @@
 const cron = require('node-cron');
 const uuid = require('uuid/v5');
-const { generateCronDateExpression } = require('../utils/generateCronDateExpression.js');
-const { AnswersFormatter } = require('../../answersFormatter.js');
+const Injection = require('../../../configuration/registerTypes.js');
 const { answers } = require('../messageProperties/answers.js');
-const { Logger } = require('../../../common/logger.js');
+const { generateCronDateExpression } = require('../utils/generateCronDateExpression.js');
 
 class NewIteration {
     constructor() {
         this.iterations = [];
         this.conversationReferences = {};
         this.sheduledIterationNotifications = [];
-        this.answersFormatter = new AnswersFormatter(answers);
-        this.logger = new Logger('NewIteration');
+        this.answersFormatter = Injection.getInstance('Common.AnswersFormatter', answers);
+        this.logger = Injection.getInstance('Common.Logger', __filename);
     }
 
     addIterations(iterations = []) {
@@ -37,10 +36,7 @@ class NewIteration {
                     this._removeSheduledCongradulation(taskId, sheduledCongradulation);
                     this._removeIteration(iteration);
                 });
-            },
-            {
-                timezone: process.env.Timezone
-            });
+            }, { timezone: process.env.Timezone });
 
             const sheduledEventExists = this.sheduledIterationNotifications.map(task => task.taskId).includes(taskId);
             if (sheduledEventExists) {

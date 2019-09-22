@@ -1,11 +1,11 @@
-const { AnswersFormatter } = require('../answersFormatter.js');
+const Injection = require('../../configuration/registerTypes.js');
 const keyPhrases = require('./keyPhrases/remoteWorkPhrases.json');
 const { answers } = require('./textAnswers/answers.js');
 
 class AnswerDecision {
     constructor(botId) {
         this.botId = botId;
-        this.answersFormatter = new AnswersFormatter(answers);
+        this.answersFormatter = Injection.getInstance('Common.AnswersFormatter', answers);
     }
 
     answerOnMembersRemoteWork(message, userName) {

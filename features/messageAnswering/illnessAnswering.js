@@ -1,10 +1,10 @@
-const { AnswersFormatter } = require('../answersFormatter.js');
+const Injection = require('../../configuration/registerTypes.js');
 const keyPhrases = require('./keyPhrases/gotSickToday.json');
 const { answers } = require('./textAnswers/answers.js');
 
 class IllnessAnswering {
     constructor() {
-        this.answersFormatter = new AnswersFormatter(answers);
+        this.answersFormatter = Injection.getInstance('Common.AnswersFormatter', answers);
     }
 
     getAnswerMessage(message = '') {
