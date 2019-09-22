@@ -1,19 +1,20 @@
-const monthList = require('../../../common/months.json');
 const cron = require('node-cron');
 const uuid = require('uuid/v5');
+const monthList = require('../../../common/months.json');
+const Injection = require('../../../configuration/registerTypes.js');
 
 class HolidaySheduler {
     constructor(holidays) {
         this.holidays = holidays;
-        this.conversationReferences = {};
         this.sheduledCongradulations = [];
+        this.conversationReferences = Injection.getInstance('DAL.ReferenceRepository');
         this.months = monthList;
     }
 
     shedule(sendEventCallback) {
-        for (const conversationReference of Object.values(this.conversationReferences)) {
+        this.conversationReferences.all.forEach(conversationReference => {
             this.sheduleHolidaysCongraduloations(conversationReference, sendEventCallback);
-        }
+        });
     }
 
     sheduleHolidaysCongraduloations(conversationReference, sendEventCallback) {
@@ -31,10 +32,8 @@ class HolidaySheduler {
                     await turnContext.sendActivity(holidayDate.name);
                     await turnContext.sendActivity(holidayDate.selebration);
                 });
-            },
-            {
-                timezone: process.env.Timezone
-            });
+            }, { timezone: process.env.Timezone });
+
             const sheduledEventExists = this.sheduledCongradulations.map(sc => sc.taskId).includes(taskId);
             if (sheduledEventExists) {
                 sheduledCongradulation.destroy();
@@ -42,14 +41,6 @@ class HolidaySheduler {
                 this.sheduledCongradulations.push({ sheduledCongradulation, taskId });
             }
         });
-    }
-
-    addConversationReference(conversationReference) {
-        const conversationId = conversationReference.conversation.id;
-        const conversationIds = Object.keys(this.conversationReferences);
-        if (!conversationIds.includes(conversationId)) {
-            this.conversationReferences[conversationId] = conversationReference;
-        }
     }
 }
 

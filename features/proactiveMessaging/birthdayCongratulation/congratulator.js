@@ -1,21 +1,18 @@
-const monthList = require('../../../common/months.json');
 const cron = require('node-cron');
 const uuid = require('uuid/v5');
+const monthList = require('../../../common/months.json');
+const Injection = require('../../../configuration/registerTypes.js');
 
 class Сongratulator {
     constructor(birthDates = []) {
-        this.birthDates = birthDates;
-        this.conversationReferences = {};
-        this.sheduledCongradulations = [];
         this.months = monthList;
-    }
-
-    containsKey(conversationName) {
-        return !!this.birthDates[conversationName];
+        this.birthDates = birthDates;
+        this.sheduledCongradulations = [];
+        this.conversationReferences = Injection.getInstance('DAL.ReferenceRepository');
     }
 
     shedule(sendEventCallback) {
-        for (const conversationReference of Object.values(this.conversationReferences)) {
+        this.conversationReferences.all.forEach(conversationReference => {
             const congradulatinGroupExists =
                 conversationReference.conversation.name &&
                 conversationReference.conversation.isGroup &&
@@ -24,7 +21,7 @@ class Сongratulator {
             if (congradulatinGroupExists) {
                 this.sheduleBirthdayCongraduloations(conversationReference, sendEventCallback);
             }
-        }
+        });
     }
 
     sheduleBirthdayCongraduloations(conversationReference, sendEventCallback) {
@@ -42,10 +39,8 @@ class Сongratulator {
                 sendEventCallback(conversationReference, async (turnContext) => {
                     await turnContext.sendActivity(`С днём рождения, <at>${ birthdayDate.name }</at>!`);
                 });
-            },
-            {
-                timezone: process.env.Timezone
-            });
+            }, { timezone: process.env.Timezone });
+
             const sheduledEventExists = this.sheduledCongradulations.map(task => task.taskId).includes(taskId);
             if (sheduledEventExists) {
                 sheduledCongradulation.destroy();
@@ -59,7 +54,7 @@ class Сongratulator {
         const conversationId = conversationReference.conversation.id;
         const conversationName = conversationReference.conversation.name;
         const conversationIds = Object.keys(this.conversationReferences);
-        if (this.containsKey(conversationName) && !conversationIds.includes(conversationId)) {
+        if (!!this.birthDates[conversationName] && !conversationIds.includes(conversationId)) {
             this.conversationReferences[conversationId] = conversationReference;
         }
     }

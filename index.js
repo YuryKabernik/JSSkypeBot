@@ -5,7 +5,7 @@ const { registerTypes } = require('./configuration/registerTypes.js');
 
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
-const { BotFrameworkAdapter } = require('botbuilder');
+const { BotFrameworkAdapter, TurnContext } = require('botbuilder');
 
 // Import required bot configuration.
 const ENV_FILE = path.join(__dirname, '.env');
@@ -42,11 +42,16 @@ const injecType = registerTypes();
 // Create the main dialog.
 const skypeBot = injecType('Common.SkypeBot');
 const logger = injecType('Common.Logger', __filename);
+const referenceRepository = injecType('DAL.ReferenceRepository');
 
 // Listen for incoming requests.
 server.post('/api/messages', (req, res) => {
     adapter.processActivity(req, res, async (context) => {
-        skypeBot.id = context.activity.recipient.id;
+        if (!skypeBot.id) {
+            skypeBot.id = context.activity.recipient.id;
+        }
+        const conversationReference = TurnContext.getConversationReference(context.activity);
+        referenceRepository.save(conversationReference);
         await skypeBot.run(context);
     });
 });
@@ -63,6 +68,9 @@ server.post('/api/notify/iterations', (req, res) => {
             iterations = req.body.iterations;
         }
         skypeBot.iterationsNotification.addIterations(iterations);
+        skypeBot.iterationsNotification.shedule(
+            (conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback)
+        );
     } catch (error) {
         sendResponse(res, 500, 'Unable to handle your request. Is your request body correct?');
         throw error;
@@ -75,7 +83,6 @@ server.get('/api/notify/shedule', (req, res) => {
     const sendEventCallback = (conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback);
     skypeBot.congratulator.shedule(sendEventCallback);
     skypeBot.holidays.shedule(sendEventCallback);
-    skypeBot.iterationsNotification.shedule(sendEventCallback);
 
     sendResponse(res, 200, 'Proactive messages has been setted.');
 });

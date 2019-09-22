@@ -1,4 +1,4 @@
-const { ActivityHandler, TurnContext } = require('botbuilder');
+const { ActivityHandler } = require('botbuilder');
 const { birthdayDates } = require('./features/proactiveMessaging/birthdayCongratulation/birthdayDates.js');
 const { holidays } = require('./features/proactiveMessaging/holidayReminder/holidays.js');
 const Injection = require('./configuration/registerTypes.js');
@@ -16,7 +16,6 @@ class SkypeBot extends ActivityHandler {
         this._assignOnMessageAction();
         this._assignOnTurnAction();
         this._assignOnMembersRemovedAction();
-        this._assignConversationReference();
     }
 
     _assignOnMessageAction() {
@@ -37,16 +36,6 @@ class SkypeBot extends ActivityHandler {
                     await this.answerOnRemoteWorkMessage(context);
                 }
             }
-            await next();
-        });
-    }
-
-    _assignConversationReference() {
-        this.onConversationUpdate(async (context, next) => {
-            const conversationReference = TurnContext.getConversationReference(context.activity);
-            this.iterationsNotification.addConversationReference(conversationReference);
-            this.congratulator.addConversationReference(conversationReference);
-            this.holidays.addConversationReference(conversationReference);
             await next();
         });
     }
