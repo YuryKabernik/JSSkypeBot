@@ -1,10 +1,14 @@
 class NotificationRepository {
     get all() {
-        return this.notifications;
+        return this.notifications || [];
     }
 
     constructor() {
         this.notifications = [];
+    }
+
+    includes(taskId) {
+        return !!this.notifications.map(task => task.taskId).includes(taskId);
     }
 
     save(notification) {

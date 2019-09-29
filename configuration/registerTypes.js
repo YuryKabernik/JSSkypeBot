@@ -6,6 +6,7 @@ const { Сongratulator } = require('../features/proactiveMessaging/birthdayCongr
 const { AnswerDecision } = require('../features/messageAnswering/answerDecision.js');
 const { HolidaySheduler } = require('../features/proactiveMessaging/holidayReminder/holidayScheduler.js');
 const { NewIteration } = require('../features/proactiveMessaging/iterationUpdate/newIteration.js');
+const { WeeklyReminder } = require('../features/proactiveMessaging/weeklyReminder/weeklyReminder.js');
 const { AnswersFormatter } = require('../features/answersFormatter.js');
 const { ReferenceRepository } = require('../storage/ReferenceRepository.js');
 const { NotificationRepository } = require('../storage/NotificationRepository.js');
@@ -26,6 +27,7 @@ function registerTypes() {
     injector.register('SkypeBot.IllnessAnswering', (...args) => new IllnessAnswering(...args));
     injector.register('SkypeBot.Сongratulator', (...args) => new Сongratulator(...args));
     injector.register('SkypeBot.NewIteration', new NewIteration());
+    injector.register('SkypeBot.WeeklyReminder', new WeeklyReminder());
 
     injector.register('Common.SkypeBot', new SkypeBot());
 

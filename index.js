@@ -30,6 +30,9 @@ const adapter = new BotFrameworkAdapter({
     appPassword: process.env.MicrosoftAppPassword
 });
 
+// Proactive messaging callback.
+const sendEventCallback = (conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback);
+
 // Catch-all for errors.
 adapter.onTurnError = async (context, error) => {
     console.error(`\n [onTurnError]: ${ error }`);
@@ -68,9 +71,26 @@ server.post('/api/notify/iterations', (req, res) => {
             iterations = req.body.iterations;
         }
         skypeBot.iterationsNotification.addIterations(iterations);
-        skypeBot.iterationsNotification.shedule(
-            (conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback)
-        );
+        skypeBot.iterationsNotification.shedule(sendEventCallback);
+    } catch (error) {
+        sendResponse(res, 500, 'Unable to handle your request. Is your request body correct?');
+        throw error;
+    }
+    sendResponse(res, 200, 'New Iterations have been sheduled!');
+});
+
+server.post('/api/notify/weekly', (req, res) => {
+    logger.logInfo(`New weekly events income ${ JSON.stringify(req.body) }`);
+    try {
+        let weekEvents = [];
+        if (req.body && typeof req.body === 'object') {
+            weekEvents = req.body.weekEvents;
+        } else if (req.body) {
+            req.body = JSON.parse(req.body);
+            weekEvents = req.body.weekEvents;
+        }
+        skypeBot.weeklyReminder.add(weekEvents);
+        skypeBot.weeklyReminder.shedule(sendEventCallback);
     } catch (error) {
         sendResponse(res, 500, 'Unable to handle your request. Is your request body correct?');
         throw error;
@@ -80,7 +100,6 @@ server.post('/api/notify/iterations', (req, res) => {
 
 // Listen for incoming notifications and send proactive messages to users.
 server.get('/api/notify/shedule', (req, res) => {
-    const sendEventCallback = (conversationReference, asyncCallback) => adapter.continueConversation(conversationReference, asyncCallback);
     skypeBot.congratulator.shedule(sendEventCallback);
     skypeBot.holidays.shedule(sendEventCallback);
 

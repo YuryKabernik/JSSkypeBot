@@ -8,8 +8,7 @@ function cronDateExpression(datedObject) {
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const seconds = date.getSeconds();
-    const dateExpression = `${ seconds } ${ minutes } ${ hours } ${ dateDay } ${ month } *`;
-    return dateExpression;
+    return `${ seconds } ${ minutes } ${ hours } ${ dateDay } ${ month } *`;
 }
 
 module.exports.cronDateExpression = cronDateExpression;

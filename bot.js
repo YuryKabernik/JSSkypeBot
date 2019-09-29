@@ -12,6 +12,7 @@ class SkypeBot extends ActivityHandler {
         this.iterationsNotification = Injection.getInstance('SkypeBot.NewIteration');
         this.illnessAnswering = Injection.getInstance('SkypeBot.IllnessAnswering', botId);
         this.congratulator = Injection.getInstance('SkypeBot.Сongratulator', birthdayDates);
+        this.weeklyReminder = Injection.getInstance('SkypeBot.WeeklyReminder');
         this._assignOnMembersAdded();
         this._assignOnMessageAction();
         this._assignOnTurnAction();
