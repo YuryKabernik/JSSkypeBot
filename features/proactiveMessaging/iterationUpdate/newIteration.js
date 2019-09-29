@@ -2,7 +2,7 @@ const cron = require('node-cron');
 const uuid = require('uuid/v5');
 const Injection = require('../../../configuration/registerTypes.js');
 const { answers } = require('../messageProperties/answers.js');
-const { generateCronDateExpression } = require('../utils/generateCronDateExpression.js');
+const { cronDateExpression } = require('../utils/cronDateExpression.js');
 
 class NewIteration {
     constructor() {
@@ -27,7 +27,7 @@ class NewIteration {
 
     sheduleNewIterationsNotification(conversationReference, sendEventCallback) {
         this.iterations.forEach(iteration => {
-            const dateExpression = generateCronDateExpression(iteration);
+            const dateExpression = cronDateExpression(iteration);
             const taskId = uuid(dateExpression + iteration.name, process.env.MicrosoftAppId);
             const sheduledCongradulation = cron.schedule(dateExpression, () => {
                 sendEventCallback(conversationReference, async (turnContext) => {

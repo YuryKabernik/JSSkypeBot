@@ -2,7 +2,7 @@ const cron = require('node-cron');
 const uuid = require('uuid/v5');
 const monthList = require('../../../common/months.json');
 const Injection = require('../../../configuration/registerTypes.js');
-const { generateCronDateExpression } = require('../utils/generateCronDateExpression.js');
+const { cronDateExpression } = require('../utils/cronDateExpression.js');
 
 class Сongratulator {
     constructor(birthDates = []) {
@@ -28,7 +28,7 @@ class Сongratulator {
     sheduleBirthdayCongraduloations(conversationReference, sendEventCallback) {
         const birthDates = this.birthDates[conversationReference.conversation.name] || [];
         birthDates.forEach(birthdayDate => {
-            const dateExpression = generateCronDateExpression(birthdayDate);
+            const dateExpression = cronDateExpression(birthdayDate);
             const taskId = uuid(dateExpression, process.env.MicrosoftAppId);
             const sheduledCongradulation = cron.schedule(dateExpression, () => {
                 sendEventCallback(conversationReference, async (turnContext) => {
