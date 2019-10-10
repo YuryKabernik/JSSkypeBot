@@ -71,7 +71,7 @@ server.post('/api/notify/iterations', (req, res) => {
             iterations = req.body.iterations;
         }
         skypeBot.iterationsNotification.addIterations(iterations);
-        skypeBot.iterationsNotification.shedule(sendEventCallback);
+        skypeBot.iterationsNotification.schedule(sendEventCallback);
     } catch (error) {
         sendResponse(res, 500, 'Unable to handle your request. Is your request body correct?');
         throw error;
@@ -90,7 +90,7 @@ server.post('/api/notify/weekly', (req, res) => {
             weekEvents = req.body.weekEvents;
         }
         skypeBot.weeklyReminder.add(weekEvents);
-        skypeBot.weeklyReminder.shedule(sendEventCallback);
+        skypeBot.weeklyReminder.schedule(sendEventCallback);
     } catch (error) {
         sendResponse(res, 500, 'Unable to handle your request. Is your request body correct?');
         throw error;
@@ -99,9 +99,11 @@ server.post('/api/notify/weekly', (req, res) => {
 });
 
 // Listen for incoming notifications and send proactive messages to users.
-server.get('/api/notify/shedule', (req, res) => {
-    skypeBot.congratulator.shedule(sendEventCallback);
-    skypeBot.holidays.shedule(sendEventCallback);
+server.get('/api/notify/schedule', (req, res) => {
+    skypeBot.holidays.schedule(sendEventCallback);
+    skypeBot.congratulator.schedule(sendEventCallback);
+    skypeBot.weeklyReminder.schedule(sendEventCallback);
+    skypeBot.iterationsNotification.schedule(sendEventCallback);
 
     sendResponse(res, 200, 'Proactive messages has been setted.');
 });

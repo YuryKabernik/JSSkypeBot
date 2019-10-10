@@ -7,7 +7,7 @@ const { cronWeekExpression } = require('../utils/cronWeekExpression.js');
 class WeeklyReminder {
     constructor() {
         this.notifications = [];
-        this.sheduledWeeklyNotifications = Injection.getInstance('DAL.NotificationRepository');
+        this.scheduledWeeklyNotifications = Injection.getInstance('DAL.NotificationRepository');
         this.conversationReferences = Injection.getInstance('DAL.ReferenceRepository');
         this.answersFormatter = Injection.getInstance('Common.AnswersFormatter', answers);
         this.logger = Injection.getInstance('Common.Logger', __filename);
@@ -27,31 +27,31 @@ class WeeklyReminder {
         }
     }
 
-    shedule(sendEventCallback) {
+    schedule(sendEventCallback) {
         this.conversationReferences.all.forEach(conversationReference => {
             this.logger.logInfo(`Sheduling weekly event on conversationReference:[${ JSON.stringify(conversationReference) }]`);
-            this.sheduleNewIterationsNotification(conversationReference, sendEventCallback);
+            this.scheduleNewIterationsNotification(conversationReference, sendEventCallback);
         });
     }
 
-    sheduleNewIterationsNotification(conversationReference, sendEventCallback) {
+    scheduleNewIterationsNotification(conversationReference, sendEventCallback) {
         this.notifications.forEach(notificationData => {
             const dateExpression = cronWeekExpression(notificationData.date);
             const taskId = uuid(dateExpression, process.env.MicrosoftAppId);
-            const sheduledNotification = cron.schedule(dateExpression, () => {
+            const scheduledNotification = cron.schedule(dateExpression, () => {
                 sendEventCallback(conversationReference, async (turnContext) => {
                     const message = this.answersFormatter.lookup('fillYourMyTimeJournal');
                     await turnContext.sendActivity(notificationData.message.trim() ? notificationData.message : message);
                 });
             }, { timezone: process.env.Timezone });
 
-            const sheduledEventExists = this.sheduledWeeklyNotifications.includes(taskId);
-            if (sheduledEventExists) {
+            const scheduledEventExists = this.scheduledWeeklyNotifications.includes(taskId);
+            if (scheduledEventExists) {
                 this.logger.logInfo(`Sheduled event already exists: CRON-DATE-TIME:[${ dateExpression }]`);
-                sheduledNotification.destroy();
+                scheduledNotification.destroy();
             } else {
-                this.logger.logInfo(`New event sheduled: CRON-DATE-TIME:[${ dateExpression }]`);
-                this.sheduledWeeklyNotifications.save({ taskId, sheduledNotification });
+                this.logger.logInfo(`New event scheduled: CRON-DATE-TIME:[${ dateExpression }]`);
+                this.scheduledWeeklyNotifications.save({ taskId, scheduledNotification });
             }
         });
     }

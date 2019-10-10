@@ -7,7 +7,7 @@ const { cronDateExpression } = require('../utils/cronDateExpression.js');
 class NewIteration {
     constructor() {
         this.iterations = [];
-        this.sheduledIterationNotifications = [];
+        this.scheduledIterationNotifications = [];
         this.conversationReferences = Injection.getInstance('DAL.ReferenceRepository');
         this.answersFormatter = Injection.getInstance('Common.AnswersFormatter', answers);
         this.logger = Injection.getInstance('Common.Logger', __filename);
@@ -18,42 +18,42 @@ class NewIteration {
         this.iterations = this.iterations.concat(iterations);
     }
 
-    shedule(sendEventCallback) {
+    schedule(sendEventCallback) {
         this.conversationReferences.all.forEach(conversationReference => {
             this.logger.logInfo(`Sheduled event on conversationReference:[${ JSON.stringify(conversationReference) }]`);
-            this.sheduleNewIterationsNotification(conversationReference, sendEventCallback);
+            this.scheduleNewIterationsNotification(conversationReference, sendEventCallback);
         });
     }
 
-    sheduleNewIterationsNotification(conversationReference, sendEventCallback) {
+    scheduleNewIterationsNotification(conversationReference, sendEventCallback) {
         this.iterations.forEach(iteration => {
             const dateExpression = cronDateExpression(iteration);
             const taskId = uuid(dateExpression + iteration.name, process.env.MicrosoftAppId);
-            const sheduledCongradulation = cron.schedule(dateExpression, () => {
+            const scheduledCongradulation = cron.schedule(dateExpression, () => {
                 sendEventCallback(conversationReference, async (turnContext) => {
                     const message = this.answersFormatter.format('transferItemsToIteration', { name: iteration.name });
                     await turnContext.sendActivity(message);
-                    this._removeSheduledCongradulation(taskId, sheduledCongradulation);
+                    this._removeSheduledCongradulation(taskId, scheduledCongradulation);
                     this._removeIteration(iteration);
                 });
             }, { timezone: process.env.Timezone });
 
-            const sheduledEventExists = this.sheduledIterationNotifications.map(task => task.taskId).includes(taskId);
-            if (sheduledEventExists) {
+            const scheduledEventExists = this.scheduledIterationNotifications.map(task => task.taskId).includes(taskId);
+            if (scheduledEventExists) {
                 this.logger.logInfo(`Sheduled event already exists: CRON-DATE-TIME:[${ dateExpression }]`);
-                sheduledCongradulation.destroy();
+                scheduledCongradulation.destroy();
             } else {
-                this.logger.logInfo(`New event sheduled: CRON-DATE-TIME:[${ dateExpression }]`);
-                this.sheduledIterationNotifications.push({ taskId, sheduledCongradulation });
+                this.logger.logInfo(`New event scheduled: CRON-DATE-TIME:[${ dateExpression }]`);
+                this.scheduledIterationNotifications.push({ taskId, scheduledCongradulation });
             }
         });
     }
 
-    _removeSheduledCongradulation(taskId, sheduledCongradulation) {
-        sheduledCongradulation.destroy();
-        const indexOfConfiguration = this.sheduledIterationNotifications.findIndex(notification => notification.taskId === taskId);
+    _removeSheduledCongradulation(taskId, scheduledCongradulation) {
+        scheduledCongradulation.destroy();
+        const indexOfConfiguration = this.scheduledIterationNotifications.findIndex(notification => notification.taskId === taskId);
         if (indexOfConfiguration !== -1) {
-            this.sheduledIterationNotifications.splice(indexOfConfiguration, 1);
+            this.scheduledIterationNotifications.splice(indexOfConfiguration, 1);
         }
     }
 
