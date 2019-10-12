@@ -8,6 +8,7 @@ class ReferenceRepository {
     constructor() {
         this.conversationReferences = {};
         this._logger = Injection.getInstance('Common.Logger', 'ReferenceRepository');
+        this._dbClient = Injection.getInstance('Services.DbClient', 'ReferenceRepository');
     }
 
     getById(conversationId) {

@@ -10,6 +10,8 @@ const { WeeklyReminder } = require('../features/proactiveMessaging/weeklyReminde
 const { AnswersFormatter } = require('../features/answersFormatter.js');
 const { ReferenceRepository } = require('../storage/ReferenceRepository.js');
 const { NotificationRepository } = require('../storage/NotificationRepository.js');
+const { DbClient } = require('../services/dbClient.js');
+const { dbConnection } = require('../configuration/dbConnection.js');
 
 let injector = null;
 
@@ -18,6 +20,8 @@ function registerTypes() {
 
     injector.register('Common.Logger', (...args) => new Logger(...args));
     injector.register('Common.AnswersFormatter', (...args) => new AnswersFormatter(...args));
+
+    injector.register('Services.DbClient', new DbClient(dbConnection()));
 
     injector.register('DAL.ReferenceRepository', new ReferenceRepository());
     injector.register('DAL.NotificationRepository', new NotificationRepository());

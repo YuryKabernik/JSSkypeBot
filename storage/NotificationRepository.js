@@ -1,3 +1,5 @@
+const Injection = require('../configuration/registerTypes.js');
+
 class NotificationRepository {
     get all() {
         return this.notifications || [];
@@ -5,6 +7,7 @@ class NotificationRepository {
 
     constructor() {
         this.notifications = [];
+        this._dbClient = Injection.getInstance('Services.DbClient', 'ReferenceRepository');
     }
 
     includes(taskId) {
