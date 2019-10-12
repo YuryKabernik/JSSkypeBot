@@ -12,8 +12,9 @@ class Сongratulator {
         this.conversationReferences = Injection.getInstance('DAL.ReferenceRepository');
     }
 
-    schedule(sendEventCallback) {
-        this.conversationReferences.all.forEach(conversationReference => {
+    async schedule(sendEventCallback) {
+        const conversationReferences = await this.conversationReferences.all();
+        conversationReferences.forEach(conversationReference => {
             const congradulatinGroupExists =
                 conversationReference.conversation.name &&
                 conversationReference.conversation.isGroup &&

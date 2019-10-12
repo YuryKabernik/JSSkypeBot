@@ -12,8 +12,9 @@ class HolidaySheduler {
         this.months = monthList;
     }
 
-    schedule(sendEventCallback) {
-        this.conversationReferences.all.forEach(conversationReference => {
+    async schedule(sendEventCallback) {
+        const conversationReferences = await this.conversationReferences.all();
+        conversationReferences.forEach(conversationReference => {
             this.scheduleHolidaysCongraduloations(conversationReference, sendEventCallback);
         });
     }

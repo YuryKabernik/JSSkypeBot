@@ -18,8 +18,9 @@ class NewIteration {
         this.iterations = this.iterations.concat(iterations);
     }
 
-    schedule(sendEventCallback) {
-        this.conversationReferences.all.forEach(conversationReference => {
+    async schedule(sendEventCallback) {
+        const conversationReferences = await this.conversationReferences.all();
+        conversationReferences.forEach(conversationReference => {
             this.logger.logInfo(`Sheduled event on conversationReference:[${ JSON.stringify(conversationReference) }]`);
             this.scheduleNewIterationsNotification(conversationReference, sendEventCallback);
         });

@@ -99,11 +99,11 @@ server.post('/api/notify/weekly', (req, res) => {
 });
 
 // Listen for incoming notifications and send proactive messages to users.
-server.get('/api/notify/schedule', (req, res) => {
-    skypeBot.holidays.schedule(sendEventCallback);
-    skypeBot.congratulator.schedule(sendEventCallback);
-    skypeBot.weeklyReminder.schedule(sendEventCallback);
-    skypeBot.iterationsNotification.schedule(sendEventCallback);
+server.get('/api/notify/schedule', async (req, res) => {
+    await skypeBot.holidays.schedule(sendEventCallback);
+    await skypeBot.congratulator.schedule(sendEventCallback);
+    await skypeBot.weeklyReminder.schedule(sendEventCallback);
+    await skypeBot.iterationsNotification.schedule(sendEventCallback);
 
     sendResponse(res, 200, 'Proactive messages has been setted.');
 });

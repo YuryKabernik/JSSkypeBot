@@ -1,32 +1,46 @@
 const Injection = require('../configuration/registerTypes.js');
+const { GetReferenceById, GetAllReferences, SaveReference } = require('./Queries/references.js');
 
 class ReferenceRepository {
-    get all() {
-        return Object.values(this.conversationReferences);
-    }
-
     constructor() {
-        this.conversationReferences = {};
         this._logger = Injection.getInstance('Common.Logger', 'ReferenceRepository');
-        this._dbClient = Injection.getInstance('Services.DbClient', 'ReferenceRepository');
+        this._dbClient = Injection.getInstance('Services.DbClient');
     }
 
-    getById(conversationId) {
-        const conversationIdExists = Object.keys(this.conversationReferences).includes(conversationId);
-        if (conversationIdExists) {
-            return this.conversationReferences[conversationId];
+    async all() {
+        let result = null;
+        try {
+            result = await this._dbClient.request(GetAllReferences);
+        } catch (error) {
+            this._logger.logError(error);
         }
+        return result.recordset.map(record => {
+            const { ConversationObject } = record;
+            return JSON.parse(ConversationObject);
+        });
     }
 
-    save(conversationReference) {
-        const conversationId = conversationReference.conversation.id;
-        const containsConversationId = Object.keys(this.conversationReferences).includes(conversationId);
-        if (!containsConversationId) {
-            this._logger.logInfo(`New conversation registred: ${ conversationId }`);
-            this.conversationReferences[conversationId] = conversationReference;
-        } else {
-            this._logger.logInfo(`Conversation already registred: ${ conversationId }`);
+    async getById(conversationId) {
+        let result = null;
+        try {
+            result = await this._dbClient.request(GetReferenceById, conversationId);
+        } catch (error) {
+            this._logger.logError(error);
         }
+        return result.recordset.map(record => {
+            const { ConversationObject } = record;
+            return JSON.parse(ConversationObject);
+        })[0];
+    }
+
+    async save(reference) {
+        let result = null;
+        try {
+            result = await this._dbClient.request(SaveReference, reference);
+        } catch (error) {
+            this._logger.logError(error);
+        }
+        return result.returnValue;
     }
 }
 
