@@ -25,7 +25,7 @@ module.exports.SaveReference = function SaveReference(connection, reference) {
             .input('ConversationId', reference.conversation.id)
             .input('TenantId', reference.conversation.tenantId || '')
             .input('ConversationObject', JSON.stringify(reference))
-            .input('IsGroup', reference.conversation.IsGroup || false)
+            .input('IsGroup', reference.conversation.isGroup || false)
             .execute('SaveReference')
     };
 };

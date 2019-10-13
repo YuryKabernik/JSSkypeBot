@@ -14,7 +14,7 @@ class ReferenceRepository {
         } catch (error) {
             this._logger.logError(error);
         }
-        return result.recordset.map(record => {
+        return (result.recordset || []).map(record => {
             const { ConversationObject } = record;
             return JSON.parse(ConversationObject);
         });
@@ -27,7 +27,7 @@ class ReferenceRepository {
         } catch (error) {
             this._logger.logError(error);
         }
-        return result.recordset.map(record => {
+        return (result.recordset || []).map(record => {
             const { ConversationObject } = record;
             return JSON.parse(ConversationObject);
         })[0];
@@ -40,7 +40,10 @@ class ReferenceRepository {
         } catch (error) {
             this._logger.logError(error);
         }
-        return result.returnValue;
+        if (result && result.returnValue) {
+            return result.returnValue;
+        }
+        return result;
     }
 }
 
