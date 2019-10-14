@@ -79,7 +79,7 @@ server.post('/api/notify/iterations', (req, res) => {
     sendResponse(res, 200, 'New Iterations have been sheduled!');
 });
 
-server.post('/api/notify/weekly', (req, res) => {
+server.post('/api/notify/weekly', async (req, res) => {
     logger.logInfo(`New weekly events income ${ JSON.stringify(req.body) }`);
     try {
         let weekEvents = [];
@@ -89,8 +89,8 @@ server.post('/api/notify/weekly', (req, res) => {
             req.body = JSON.parse(req.body);
             weekEvents = req.body.weekEvents;
         }
-        skypeBot.weeklyReminder.add(weekEvents);
-        skypeBot.weeklyReminder.schedule(sendEventCallback);
+        await skypeBot.weeklyReminder.add(weekEvents);
+        await skypeBot.weeklyReminder.schedule(sendEventCallback);
     } catch (error) {
         sendResponse(res, 500, 'Unable to handle your request. Is your request body correct?');
         throw error;

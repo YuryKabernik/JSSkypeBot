@@ -25,8 +25,14 @@ class HolidaySheduler {
             const taskId = uuid(dateExpression, process.env.MicrosoftAppId);
             const scheduledCongradulation = cron.schedule(dateExpression, () => {
                 sendEventCallback(conversationReference, async (turnContext) => {
-                    await turnContext.sendActivity(holidayDate.name);
-                    await turnContext.sendActivity(holidayDate.selebration);
+                    try {
+                        await turnContext.sendActivity(holidayDate.name);
+                        await turnContext.sendActivity(holidayDate.selebration);
+                    } catch (error) {
+                        this.logger.logError(
+                            `Holiday Notification executions failed! Message: ${ error.message } Stack: ${ error.stack }`
+                        );
+                    }
                 });
             }, { timezone: process.env.Timezone });
 

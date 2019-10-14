@@ -33,7 +33,13 @@ class Сongratulator {
             const taskId = uuid(dateExpression, process.env.MicrosoftAppId);
             const scheduledCongradulation = cron.schedule(dateExpression, () => {
                 sendEventCallback(conversationReference, async (turnContext) => {
-                    await turnContext.sendActivity(`С днём рождения, <at>${ birthdayDate.name }</at>!`);
+                    try {
+                        await turnContext.sendActivity(`С днём рождения, <at>${ birthdayDate.name }</at>!`);
+                    } catch (error) {
+                        this.logger.logError(
+                            `Birthday Notification for ${ birthdayDate.name } executions failed! Message: ${ error.message } Stack: ${ error.stack }`
+                        );
+                    }
                 });
             }, { timezone: process.env.Timezone });
 

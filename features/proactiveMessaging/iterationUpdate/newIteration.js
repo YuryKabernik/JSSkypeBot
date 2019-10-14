@@ -32,10 +32,17 @@ class NewIteration {
             const taskId = uuid(dateExpression + iteration.name, process.env.MicrosoftAppId);
             const scheduledCongradulation = cron.schedule(dateExpression, () => {
                 sendEventCallback(conversationReference, async (turnContext) => {
-                    const message = this.answersFormatter.format('transferItemsToIteration', { name: iteration.name });
-                    await turnContext.sendActivity(message);
-                    this._removeSheduledCongradulation(taskId, scheduledCongradulation);
-                    this._removeIteration(iteration);
+                    try {
+                        const message = this.answersFormatter.format('transferItemsToIteration', { name: iteration.name });
+                        await turnContext.sendActivity(message);
+                    } catch (error) {
+                        this.logger.logError(
+                            `Iteration Notification executions failed! Message: ${ error.message } Stack: ${ error.stack }`
+                        );
+                    } finally {
+                        this._removeSheduledCongradulation(taskId, scheduledCongradulation);
+                        this._removeIteration(iteration);
+                    }
                 });
             }, { timezone: process.env.Timezone });
 
