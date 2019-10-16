@@ -15,6 +15,11 @@ module.exports = {
         "?": "after",
         ":": "after"
       }
-    }]
+    }],
+    "space-before-function-paren": ["error", {
+      "anonymous": "always",
+      "named": "never",
+      "asyncArrow": "always"
+  }],
   }
 };

@@ -9,7 +9,7 @@ class Logger {
         const dateTimeNow = new Date();
         const timeStamp = dateTimeNow.toLocaleTimeString();
         const dateStamp = dateTimeNow.toLocaleDateString();
-        console.info(`\n ${ prefix } --- ${ dateStamp } ${ timeStamp } --- ${ message } \n`);
+        console.info(`${ prefix } --- ${ dateStamp } ${ timeStamp } --- ${ message } \n`);
     }
 
     logError(message = '') {
@@ -17,7 +17,7 @@ class Logger {
         const dateTimeNow = new Date();
         const timeStamp = dateTimeNow.toLocaleTimeString();
         const dateStamp = dateTimeNow.toLocaleDateString();
-        console.info(`\n ${ prefix } --- ${ dateStamp } ${ timeStamp } --- ${ message } \n`);
+        console.error(`${ prefix } --- ${ dateStamp } ${ timeStamp } --- ${ message } \n`);
     }
 }
 

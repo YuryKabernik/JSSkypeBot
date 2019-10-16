@@ -2,6 +2,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const restify = require('restify');
 const { registerTypes } = require('./configuration/registerTypes.js');
+const { start } = require('./startup/startupApplication.js');
 
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
@@ -16,12 +17,6 @@ const server = restify.createServer();
 
 server.use(restify.plugins.acceptParser(server.acceptable));
 server.use(restify.plugins.bodyParser({ mapParams: false }));
-
-server.listen(process.env.port || process.env.PORT || 3978, () => {
-    console.log(`\n${ server.name } listening to ${ server.url }`);
-    console.log(`\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator`);
-    console.log(`\nTo test your bot, see: https://aka.ms/debug-with-emulator`);
-});
 
 // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about how bots work.
@@ -54,7 +49,7 @@ server.post('/api/messages', (req, res) => {
             skypeBot.id = context.activity.recipient.id;
         }
         const conversationReference = TurnContext.getConversationReference(context.activity);
-        referenceRepository.save(conversationReference);
+        await referenceRepository.save(conversationReference);
         await skypeBot.run(context);
     });
 });
@@ -98,19 +93,16 @@ server.post('/api/notify/weekly', async (req, res) => {
     sendResponse(res, 200, 'New Iterations have been sheduled!');
 });
 
-// Listen for incoming notifications and send proactive messages to users.
-server.get('/api/notify/schedule', async (req, res) => {
-    await skypeBot.holidays.schedule(sendEventCallback);
-    await skypeBot.congratulator.schedule(sendEventCallback);
-    await skypeBot.weeklyReminder.schedule(sendEventCallback);
-    await skypeBot.iterationsNotification.schedule(sendEventCallback);
-
-    sendResponse(res, 200, 'Proactive messages has been setted.');
-});
-
 function sendResponse(res, statusCode, errMessage) {
     res.setHeader('Content-Type', 'text/html');
     res.writeHead(statusCode);
     res.write(`<html><body><h1>${ errMessage }</h1></body></html>`);
     res.end();
 }
+
+server.listen(process.env.port || process.env.PORT || 3978, () => {
+    logger.logInfo(`${ server.name } listening to ${ server.url }`);
+    logger.logInfo(`Get Bot Framework Emulator: https://aka.ms/botframework-emulator`);
+    logger.logInfo(`To test your bot, see: https://aka.ms/debug-with-emulator`);
+    start({ skypeBot, adapter });
+});
