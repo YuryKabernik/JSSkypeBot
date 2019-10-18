@@ -1,5 +1,5 @@
 const cron = require('node-cron');
-const uuid = require('uuid/v5');
+const guid = require('../utils/guid.js');
 const Injection = require('../../../configuration/registerTypes.js');
 const { answers } = require('../messageProperties/answers.js');
 const { cronDateExpression } = require('../utils/cronDateExpression.js');
@@ -16,7 +16,7 @@ class NewIteration {
     async addIterations(iterations = []) {
         for (let index = 0; index < iterations.length; index++) {
             const iteration = iterations[index];
-            const id = uuid(iteration.path + iteration.date, process.env.MicrosoftAppId);
+            const id = guid(iteration.path + iteration.date);
             await this.iterations.save({
                 id: id,
                 data: iteration
@@ -39,7 +39,7 @@ class NewIteration {
         const avaliableIterations = await this.iterations.all();
         avaliableIterations.forEach(iteration => {
             const dateExpression = cronDateExpression(iteration);
-            const taskId = uuid(iteration.path + iteration.date, process.env.MicrosoftAppId);
+            const taskId = guid(iteration.path + iteration.date);
             const scheduledCongradulation = cron.schedule(dateExpression, () => {
                 sendEventCallback(conversationReference, async (turnContext) => {
                     try {

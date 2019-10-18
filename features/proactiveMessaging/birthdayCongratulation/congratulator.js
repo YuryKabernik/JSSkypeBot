@@ -1,5 +1,5 @@
 const cron = require('node-cron');
-const uuid = require('uuid/v5');
+const guid = require('../utils/guid.js');
 const monthList = require('../../../common/months.json');
 const Injection = require('../../../configuration/registerTypes.js');
 const { cronDateExpression } = require('../utils/cronDateExpression.js');
@@ -30,7 +30,7 @@ class Сongratulator {
         const birthDates = this.birthDates[conversationReference.conversation.name] || [];
         birthDates.forEach(birthdayDate => {
             const dateExpression = cronDateExpression(birthdayDate);
-            const taskId = uuid(dateExpression, process.env.MicrosoftAppId);
+            const taskId = guid(dateExpression);
             const scheduledCongradulation = cron.schedule(dateExpression, () => {
                 sendEventCallback(conversationReference, async (turnContext) => {
                     try {

@@ -1,5 +1,4 @@
-const uuid = require('uuid/v5');
-const cron = require('node-cron');
+const guid = require('../utils/guid.js');
 const Injection = require('../../../configuration/registerTypes.js');
 const { answers } = require('../messageProperties/answers.js');
 const { cronWeekExpression } = require('../utils/cronWeekExpression.js');
@@ -61,7 +60,7 @@ class WeeklyReminder {
 
     async saveOne(notification) {
         const dateExpression = cronWeekExpression(notification.date);
-        const taskId = uuid(dateExpression, process.env.MicrosoftAppId);
+        const taskId = guid(dateExpression);
         await this.notifications.save({
             id: taskId,
             data: {
@@ -76,7 +75,7 @@ class WeeklyReminder {
         for (let index = 0; index < notifications.length; index++) {
             const notification = notifications[index];
             const dateExpression = cronWeekExpression(notification.date);
-            const taskId = uuid(dateExpression, process.env.MicrosoftAppId);
+            const taskId = guid(dateExpression);
             await this.notifications.save({
                 id: taskId,
                 data: {
