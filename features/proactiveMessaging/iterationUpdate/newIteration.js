@@ -27,12 +27,13 @@ class NewIteration {
 
     async schedule(sendEventCallback) {
         const conversationReferences = await this.conversationReferences.all();
-        conversationReferences.forEach(conversationReference => {
+        for (let index = 0; index < conversationReferences.length; index++) {
+            const reference = conversationReferences[index];
             this.logger.logInfo(
-                `Sheduled iteration notification event on conversationReference: ${ conversationReference.conversation.id }`
+                `Sheduled iteration notification event on conversationReference: ${ reference.conversation.id }`
             );
-            await this.scheduleNewIterationsNotification(conversationReference, sendEventCallback);
-        });
+            await this.scheduleNewIterationsNotification(reference, sendEventCallback);
+        }
     }
 
     async scheduleNewIterationsNotification(conversationReference, sendEventCallback) {

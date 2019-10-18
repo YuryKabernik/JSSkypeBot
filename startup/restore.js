@@ -1,5 +1,5 @@
 /**
- * @file Restore notifiactions from database.
+ * @file Restore bot appliaction reload.
  */
 const { MicrosoftAppCredentials } = require('botframework-connector');
 
@@ -15,6 +15,9 @@ module.exports.restoreScheduledEventsAsync = async function (bot, sendEventCallb
     ]).catch(errorHandler);
 };
 
+/**
+ * Restores service trust to the conversations after appication reload.
+ */
 module.exports.restoreServiceTrust = async function (bot, errorHandler) {
     const restoreByServiceUrl = serviceUrl => MicrosoftAppCredentials.trustServiceUrl(serviceUrl);
     await bot.restoreServiceTrust(restoreByServiceUrl)

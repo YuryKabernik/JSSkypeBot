@@ -1,4 +1,4 @@
-class Injector {
+class Container {
     constructor() {
         this._registrations = {};
     }
@@ -29,4 +29,4 @@ class Injector {
     }
 }
 
-module.exports.Injector = Injector;
+module.exports.Container = Container;
