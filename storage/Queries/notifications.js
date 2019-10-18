@@ -1,3 +1,7 @@
+/**
+ * @file Notifications - contains stored procedure request to all notification tables
+ */
+
 const sql = require('mssql');
 
 module.exports.Weekly = {

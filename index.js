@@ -55,7 +55,7 @@ server.post('/api/messages', (req, res) => {
 });
 
 // Listen for incomming information about new iterations notification
-server.post('/api/notify/iterations', (req, res) => {
+server.post('/api/notify/iterations', async (req, res) => {
     logger.logInfo(`New iterations income ${ JSON.stringify(req.body) }`);
     try {
         let iterations = [];
@@ -65,10 +65,10 @@ server.post('/api/notify/iterations', (req, res) => {
             req.body = JSON.parse(req.body);
             iterations = req.body.iterations;
         }
-        skypeBot.iterationsNotification.addIterations(iterations);
-        skypeBot.iterationsNotification.schedule(sendEventCallback);
+        await skypeBot.iterationsNotification.addIterations(iterations);
+        await skypeBot.iterationsNotification.schedule(sendEventCallback);
     } catch (error) {
-        sendResponse(res, 500, 'Unable to handle your request. Is your request body correct?');
+        sendResponse(res, 500, 'Unable to handle your request.');
         throw error;
     }
     sendResponse(res, 200, 'New Iterations have been sheduled!');

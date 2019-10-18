@@ -9,6 +9,7 @@ const { NewIteration } = require('../features/proactiveMessaging/iterationUpdate
 const { WeeklyReminder } = require('../features/proactiveMessaging/weeklyReminder/weeklyReminder.js');
 const { AnswersFormatter } = require('../features/answersFormatter.js');
 const { ReferenceRepository } = require('../storage/ReferenceRepository.js');
+const { IterationRepository } = require('../storage/IterationRepository.js');
 const { NotificationRepository } = require('../storage/NotificationRepository.js');
 const { DbClient } = require('../services/dbClient.js');
 const { dbConnection } = require('../configuration/dbConnection.js');
@@ -24,6 +25,7 @@ function registerTypes() {
     injector.register('Services.DbClient', new DbClient(dbConnection()));
 
     injector.register('DAL.ReferenceRepository', new ReferenceRepository());
+    injector.register('DAL.IterationRepository', new IterationRepository());
     injector.register('DAL.NotificationRepository', new NotificationRepository());
 
     injector.register('SkypeBot.TextAnswers', (...args) => new AnswerDecision(...args));
