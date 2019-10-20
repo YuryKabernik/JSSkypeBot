@@ -21,8 +21,8 @@ module.exports.Iterations = {
         return {
             execute: async () => await connection
                 .request()
-                .input('id', id)
-                .input('path', iteration.path)
+                .input('id', sql.NVarChar, id)
+                .input('path', sql.NVarChar, iteration.path)
                 .input('date', iteration.date)
                 .execute('SaveIteration')
         };

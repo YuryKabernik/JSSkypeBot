@@ -1,5 +1,5 @@
 const cron = require('node-cron');
-const guid = require('../utils/guid.js');
+const { guid } = require('../utils/guid.js');
 const Injection = require('../../../configuration/registerTypes.js');
 const { answers } = require('../messageProperties/answers.js');
 const { cronDateExpression } = require('../utils/cronDateExpression.js');
@@ -29,9 +29,6 @@ class NewIteration {
         const conversationReferences = await this.conversationReferences.all();
         for (let index = 0; index < conversationReferences.length; index++) {
             const reference = conversationReferences[index];
-            this.logger.logInfo(
-                `Sheduled iteration notification event on conversationReference: ${ reference.conversation.id }`
-            );
             await this.scheduleNewIterationsNotification(reference, sendEventCallback);
         }
     }

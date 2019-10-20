@@ -1,4 +1,5 @@
-const guid = require('../utils/guid.js');
+const cron = require('node-cron');
+const { guid } = require('../utils/guid.js');
 const Injection = require('../../../configuration/registerTypes.js');
 const { answers } = require('../messageProperties/answers.js');
 const { cronWeekExpression } = require('../utils/cronWeekExpression.js');

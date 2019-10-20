@@ -15,8 +15,8 @@ class IterationRepository {
             this._logger.logError(error);
         }
         return result && (result.recordset || []).map(record => {
-            const { Id, ExecutionDate, UserMessage, CreationDate } = record;
-            return { id: Id, date: ExecutionDate, message: UserMessage, creationDate: CreationDate };
+            const { ID, Date, Path } = record;
+            return { id: ID, date: Date, message: Path };
         });
     }
 
