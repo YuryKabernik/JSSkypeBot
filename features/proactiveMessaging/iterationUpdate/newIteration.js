@@ -37,7 +37,6 @@ class NewIteration {
         const avaliableIterations = await this.iterations.all();
         avaliableIterations.forEach(iteration => {
             const dateExpression = cronDateExpression(iteration);
-            const taskId = guid(iteration.path + iteration.date);
             const scheduledCongradulation = cron.schedule(dateExpression, () => {
                 sendEventCallback(conversationReference, async (turnContext) => {
                     try {
@@ -48,19 +47,19 @@ class NewIteration {
                             `Iteration Notification executions failed! Message: ${ error.message } Stack: ${ error.stack }`
                         );
                     } finally {
-                        this._removeSheduledCongradulation(taskId, scheduledCongradulation);
-                        await this.iterations.remove(taskId);
+                        this._removeSheduledCongradulation(iteration.id, scheduledCongradulation);
+                        await this.iterations.remove(iteration.id);
                     }
                 });
             }, { timezone: process.env.Timezone });
 
-            const scheduledEventExists = this.scheduledIterationNotifications.includes(task => task.taskId === taskId);
-            if (scheduledEventExists) {
+            const scheduledEventExists = this.scheduledIterationNotifications.findIndex(task => task.taskId === iteration.id);
+            if (scheduledEventExists !== -1) {
                 this.logger.logInfo(`Sheduled iteration event already exists: CRON-DATE-TIME:[${ dateExpression }]`);
                 scheduledCongradulation.destroy();
             } else {
                 this.logger.logInfo(`New iteration event scheduled: CRON-DATE-TIME:[${ dateExpression }]`);
-                this.scheduledIterationNotifications.push({ taskId, scheduledCongradulation });
+                this.scheduledIterationNotifications.push({ taskId: iteration.id, scheduledCongradulation });
             }
         });
     }

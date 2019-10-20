@@ -16,7 +16,7 @@ class IterationRepository {
         }
         return result && (result.recordset || []).map(record => {
             const { ID, Date, Path } = record;
-            return { id: ID, date: Date, message: Path };
+            return { id: ID, date: Date, path: Path };
         });
     }
 
