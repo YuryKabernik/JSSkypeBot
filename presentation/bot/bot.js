@@ -1,6 +1,6 @@
 const { Messaging } = require('./controller/messaging.js');
 
-function getRouts(router) {
+module.exports.botRoutes = function getRouts(router) {
     const messagingController = new Messaging();
 
     router.mount(
@@ -9,6 +9,4 @@ function getRouts(router) {
     );
 
     return router;
-}
-
-module.exports.botRoutes = getRouts;
+};

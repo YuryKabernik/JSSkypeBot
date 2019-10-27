@@ -1,6 +1,6 @@
 const { Notifications } = require('./endpoint/notifications.js');
 
-function getRouts(router) {
+module.exports.apiRoutes = function getRouts(router) {
     const notificationsController = new Notifications();
 
     router.mount(
@@ -13,6 +13,4 @@ function getRouts(router) {
     );
 
     return router;
-}
-
-module.exports.apiRoutes = getRouts;
+};
