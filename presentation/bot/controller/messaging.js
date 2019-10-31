@@ -12,7 +12,7 @@ class Messaging {
      * Listen for incoming chat requests.
      */
     async messages(req, res) {
-        this.adapter.processActivity(req, res, async (context) => {
+        await this.adapter.processActivity(req, res, async (context) => {
             if (!this.skypeBot.id) {
                 this.skypeBot.id = context.activity.recipient.id;
             }
