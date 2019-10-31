@@ -97,12 +97,6 @@ class SkypeBot extends ActivityHandler {
             }
         }
     }
-
-    async restoreServiceTrust(restoreCallback) {
-        const referencesRepository = Injection.getInstance('DAL.ReferenceRepository');
-        const references = await referencesRepository.all();
-        references.forEach((ref) => restoreCallback(ref.serviceUrl));
-    }
 }
 
 module.exports.SkypeBot = SkypeBot;
