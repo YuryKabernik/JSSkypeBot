@@ -1,6 +1,6 @@
 const { Container } = require('../common/injector.js');
 const { Logger } = require('../common/logger.js');
-const { SkypeBot } = require('../bot.js');
+const { SkypeBot } = require('../presentation/bot/bot.js');
 const { IllnessAnswering } = require('../features/messageAnswering/illnessAnswering.js');
 const { Сongratulator } = require('../features/proactiveMessaging/birthdayCongratulation/congratulator.js');
 const { AnswerDecision } = require('../features/messageAnswering/answerDecision.js');
@@ -11,9 +11,11 @@ const { AnswersFormatter } = require('../features/answersFormatter.js');
 const { ReferenceRepository } = require('../storage/ReferenceRepository.js');
 const { IterationRepository } = require('../storage/IterationRepository.js');
 const { NotificationRepository } = require('../storage/NotificationRepository.js');
+const { StateManagement } = require('./dialogStateManagement.js');
 const { DbClient } = require('../services/dbClient.js');
 const { dbConnection } = require('../configuration/dbConnection.js');
 const { botAdapter } = require('../configuration/botAdapter.js');
+const { MemoryStorage } = require('botbuilder');
 
 let injector = null;
 
@@ -29,6 +31,7 @@ function registerTypes() {
         injector.register('DAL.ReferenceRepository', new ReferenceRepository());
         injector.register('DAL.IterationRepository', new IterationRepository());
         injector.register('DAL.NotificationRepository', new NotificationRepository());
+        injector.register('DAL.InMemory', new MemoryStorage());
 
         injector.register('SkypeBot.TextAnswers', (...args) => new AnswerDecision(...args));
         injector.register('SkypeBot.HolidaySheduler', (...args) => new HolidaySheduler(...args));
@@ -36,6 +39,7 @@ function registerTypes() {
         injector.register('SkypeBot.Сongratulator', (...args) => new Сongratulator(...args));
         injector.register('SkypeBot.NewIteration', new NewIteration());
         injector.register('SkypeBot.WeeklyReminder', new WeeklyReminder());
+        injector.register('SkypeBot.State', new StateManagement());
 
         injector.register('Bot.SkypeBot', new SkypeBot());
         injector.register('Bot.Adapter', botAdapter());
