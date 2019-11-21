@@ -17,6 +17,7 @@ module.exports.botAdapter = function () {
     // Catch-all for errors.
     adapter.onTurnError = async (context, error) => {
         console.error(`\n [onTurnError]: ${ error }`);
+        console.error(`\n [onTurnError]: ${ error.stack }`);
         await context.sendActivity(`Oops. Something went wrong!`); // Send a message to the user
     };
 

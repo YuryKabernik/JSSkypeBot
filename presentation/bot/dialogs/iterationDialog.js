@@ -1,31 +1,22 @@
 // Import some of the capabities from the module.
-const { ChoicePrompt, ConfirmPrompt, ComponentDialog, AttachmentLayoutTypes, DialogSet, DialogTurnStatus, WaterfallDialog, ListStyle } = require('botbuilder-dialogs');
+const { ChoicePrompt, ConfirmPrompt, ComponentDialog, DialogSet, DialogTurnStatus, WaterfallDialog } = require('botbuilder-dialogs');
+const { options } = require('./iterations/options.js');
 
 const MAIN_WATERFALL_DIALOG = 'MAIN_ITERATION_WATERFALL_DIALOG';
 
 class IterationDialog extends ComponentDialog {
-    constructor() {
+    constructor(finishCallback) {
         super('IterationDialog');
 
+        this.finishCallback = finishCallback;
+
         // Define the main dialog and its related components.
-        this.addDialog(new ChoicePrompt('iterationDateTimeChoice'));
         this.addDialog(new ConfirmPrompt('iterationSaveConfirmPrompt'));
+        this.addDialog(new ChoicePrompt('iterationDateTimeChoice'));
         this.addDialog(new WaterfallDialog(MAIN_WATERFALL_DIALOG, [
-            this.choiceCardStep.bind(this),
-            this.showCardStep.bind(this),
-            (stepContext) => {
-                stepContext.prompt('iterationDateTimeChoice', {
-                    prompt: 'What card would you like to see? You can click or type the card name',
-                    retryPrompt: 'That was not a valid choice, please select a card or number from 1 to 9.',
-                    choices: [
-                        {
-                            value: 'Adaptive Card',
-                            synonyms: ['adaptive']
-                        }
-                    ],
-                    style: ListStyle.suggestedAction
-                });
-            }
+            this.choiceIterationDate.bind(this),
+            this.confirmSelectedDate.bind(this),
+            this.displaySelectedDate.bind(this)
         ]));
 
         // The initial child Dialog to run.
@@ -42,6 +33,8 @@ class IterationDialog extends ComponentDialog {
         const dialogSet = new DialogSet(dialogState);
         dialogSet.add(this);
 
+        this.dialogState = dialogState;
+
         const dialogContext = await dialogSet.createContext(turnContext);
         const results = await dialogContext.continueDialog();
         if (results.status === DialogTurnStatus.empty) {
@@ -50,100 +43,53 @@ class IterationDialog extends ComponentDialog {
     }
 
     /**
-     * 1. Prompts the user if the user is not in the middle of a dialog.
-     * 2. Re-prompts the user when an invalid input is received.
-     *
+     * Starts dialog conversation with the bot.
      * @param {WaterfallStepContext} stepContext
      */
-    async choiceCardStep(stepContext) {
-        console.log('MainDialog.choiceCardStep');
+    async choiceIterationDate(stepContext) {
+        console.log('MainDialog.choiceIterationDate');
 
-        // Create the PromptOptions which contain the prompt and re-prompt messages.
-        // PromptOptions also contains the list of choices available to the user.
-        const options = {
-            prompt: 'What iteration notification would you like to setup? You can click or type the card name.',
-            retryPrompt: 'That was not a valid choice, please select one of the provided options or prompt your own date.',
-            style: ListStyle.suggestedAction,
-            choices: [
-                {
-                    value: 'Today',
-                    action: {
-                        type: 'imBack',
-                        title: 'Today',
-                        value: 'today'
-                    },
-                    synonyms: ['today']
-
-                },
-                {
-                    value: 'Tomorrow',
-                    action: {
-                        type: 'imBack',
-                        title: 'Tomorrow',
-                        value: 'tomorrow'
-                    },
-                    synonyms: ['tomorrow']
-                }
-            ]
-        };
+        const key = 'iterationDateTimeChoice';
 
         // Prompt the user with the configured PromptOptions.
-        return await stepContext.prompt('iterationDateTimeChoice', options);
+        return await stepContext.prompt(key, options(key, stepContext));
     }
 
     /**
-     * Send a Rich Card response to the user based on their choice.
-     * This method is only called when a valid prompt response is parsed from the user's response to the ChoicePrompt.
+     * Confirm or reject selected date and time.
      * @param {WaterfallStepContext} stepContext
      */
-    async showCardStep(stepContext) {
-        console.log('MainDialog.showCardStep');
+    async confirmSelectedDate(stepContext) {
+        console.log('MainDialog.confirmSelectedDate');
 
-        switch (stepContext.result.value) {
-        case 'Adaptive Card':
-            await stepContext.context.sendActivity({ attachments: [this.createAdaptiveCard()] });
+        const key = 'iterationSaveConfirmPrompt';
+        this.dialogState.iterationDate = new Date(stepContext.result.value);
+
+        return await stepContext.prompt(key, options(key, stepContext));
+    }
+
+    /**
+     * Finishes dialog with saving selected notification date and time.
+     * @param {WaterfallStepContext} stepContext
+     */
+    async displaySelectedDate(stepContext) {
+        console.log('MainDialog.displaySelectedDate');
+
+        switch (stepContext.result) {
+        case true:
+            await stepContext.context.sendActivity(`New Iteration notification will appear on ${ this.dialogState.iterationDate }.`);
             break;
-        case 'Animation Card':
-            await stepContext.context.sendActivity({ attachments: [this.createAnimationCard()] });
-            break;
-        case 'Audio Card':
-            await stepContext.context.sendActivity({ attachments: [this.createAudioCard()] });
-            break;
-        case 'Hero Card':
-            await stepContext.context.sendActivity({ attachments: [this.createHeroCard()] });
-            break;
-        case 'Receipt Card':
-            await stepContext.context.sendActivity({ attachments: [this.createReceiptCard()] });
-            break;
-        case 'Signin Card':
-            await stepContext.context.sendActivity({ attachments: [this.createSignInCard()] });
-            break;
-        case 'Thumbnail Card':
-            await stepContext.context.sendActivity({ attachments: [this.createThumbnailCard()] });
-            break;
-        case 'Video Card':
-            await stepContext.context.sendActivity({ attachments: [this.createVideoCard()] });
+        case false:
+            await stepContext.context.sendActivity(`Let me know when you'll decide to schedule a new notification.`);
             break;
         default:
-            await stepContext.context.sendActivity({
-                attachments: [
-                    this.createAdaptiveCard(),
-                    this.createAnimationCard(),
-                    this.createAudioCard(),
-                    this.createHeroCard(),
-                    this.createReceiptCard(),
-                    this.createSignInCard(),
-                    this.createThumbnailCard(),
-                    this.createVideoCard()
-                ],
-                attachmentLayout: AttachmentLayoutTypes.Carousel
-            });
-            break;
+            await stepContext.context.sendActivity('Is that mean Yes?');
+            return await this.confirmSelectedDate();
         }
+        this.finishCallback(this.dialogState);
 
         // Give the user instructions about what to do next
-        await stepContext.context.sendActivity('Type anything to see another card.');
-
+        await stepContext.context.sendActivity('Buy! :)');
         return await stepContext.endDialog();
     }
 }

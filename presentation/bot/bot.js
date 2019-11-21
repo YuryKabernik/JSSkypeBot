@@ -1,5 +1,5 @@
 const { ActivityHandler } = require('botbuilder');
-const { reactOnCommand } = require('./utils/reactOnCommand.js');
+const { reactOnCommand, continueBotDialog } = require('./utils/reactOnCommand.js');
 const { birthdayDates } = require('../../features/proactiveMessaging/birthdayCongratulation/birthdayDates.js');
 const { holidays } = require('../../features/proactiveMessaging/holidayReminder/holidays.js');
 const Injection = require('../../configuration/registerTypes.js');
@@ -27,6 +27,7 @@ class SkypeBot extends ActivityHandler {
             if (context.commands && context.commands.length) {
                 await this.executeCommands(context, context.commands);
             } else if (!context.activity.conversation.isGroup) {
+                await this.continueDialog(context);
                 await this.answerOnRemoteWorkMessage(context);
             }
             await next();
@@ -108,6 +109,10 @@ class SkypeBot extends ActivityHandler {
                 await context.sendActivity(botMessage);
             }
         }
+    }
+
+    async continueDialog(context) {
+        await continueBotDialog(context, this.botState);
     }
 
     async executeCommands(context, commands = []) {
