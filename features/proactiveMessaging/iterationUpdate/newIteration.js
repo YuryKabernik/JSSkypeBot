@@ -16,7 +16,7 @@ class NewIteration {
     async addIterations(iterations = []) {
         for (let index = 0; index < iterations.length; index++) {
             const iteration = iterations[index];
-            const id = guid(iteration.path + iteration.date);
+            const id = guid(`${ iteration.path } ${ iteration.date }`);
             await this.iterations.save({
                 id: id,
                 data: iteration

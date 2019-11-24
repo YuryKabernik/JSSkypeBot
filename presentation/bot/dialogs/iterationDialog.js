@@ -1,30 +1,41 @@
 // Import some of the capabities from the module.
-const { ChoicePrompt, ConfirmPrompt, ComponentDialog, DialogSet, DialogTurnStatus, WaterfallDialog } = require('botbuilder-dialogs');
+const { ComponentDialog, ChoicePrompt, DialogSet, DialogTurnStatus, WaterfallDialog } = require('botbuilder-dialogs');
 const { options } = require('./iterations/options.js');
+const { RemoveIterationDialog } = require('./iterations/remove.js');
+const { EditIterationDialog } = require('./iterations/edit.js');
+const { AddIterationDialog } = require('./iterations/add.js');
 
-const MAIN_WATERFALL_DIALOG = 'MAIN_ITERATION_WATERFALL_DIALOG';
+const CHOICE_PRESENTED_OPTION_ITERATION_ACTIVITY = 'CHOICE_PRESENTED_OPTION_ITERATION_ACTIVITY_TYPE';
+
+const REMOVE_ITERATION_WATERFALL_DIALOG = 'REMOVE_ITERATION_WATERFALL_DIALOG';
+const EDIT_ITERATION_WATERFALL_DIALOG = 'EDIT_ITERATION_WATERFALL_DIALOG';
+const ADD_ITERATION_WATERFALL_DIALOG = 'ADD_ITERATION_WATERFALL_DIALOG';
 
 class IterationDialog extends ComponentDialog {
-    constructor(finishCallback) {
-        super('IterationDialog');
+    constructor(MAIN_ITERATION_WATERFALL_DIALOG, finishCallback) {
+        super(MAIN_ITERATION_WATERFALL_DIALOG);
 
         this.finishCallback = finishCallback;
 
         // Define the main dialog and its related components.
-        this.addDialog(new ConfirmPrompt('iterationSaveConfirmPrompt'));
-        this.addDialog(new ChoicePrompt('iterationDateTimeChoice'));
-        this.addDialog(new WaterfallDialog(MAIN_WATERFALL_DIALOG, [
-            this.choiceIterationDate.bind(this),
-            this.confirmSelectedDate.bind(this),
-            this.displaySelectedDate.bind(this)
+        this.addDialog(new WaterfallDialog(MAIN_ITERATION_WATERFALL_DIALOG, [
+            this.initialStep.bind(this),
+            this.redirectIterationDialogStep.bind(this),
+            this.finalStep.bind(this)
         ]));
 
+        this.addDialog(new ChoicePrompt(CHOICE_PRESENTED_OPTION_ITERATION_ACTIVITY));
+        this.addDialog(new RemoveIterationDialog(REMOVE_ITERATION_WATERFALL_DIALOG));
+        this.addDialog(new EditIterationDialog(EDIT_ITERATION_WATERFALL_DIALOG));
+        this.addDialog(new AddIterationDialog(ADD_ITERATION_WATERFALL_DIALOG));
+
         // The initial child Dialog to run.
-        this.initialDialogId = MAIN_WATERFALL_DIALOG;
+        this.initialDialogId = MAIN_ITERATION_WATERFALL_DIALOG;
     }
 
     /**
-     * The run method handles the incoming activity (in the form of a TurnContext) and passes it through the dialog system.
+     * The run method handles the incoming activity
+     * (in the form of a TurnContext) and passes it through the dialog system.
      * If no dialog is active, it will start the default dialog.
      * @param {TurnContext} turnContext
      * @param {DialogState} dialogState
@@ -32,8 +43,6 @@ class IterationDialog extends ComponentDialog {
     async run(turnContext, dialogState) {
         const dialogSet = new DialogSet(dialogState);
         dialogSet.add(this);
-
-        this.dialogState = dialogState;
 
         const dialogContext = await dialogSet.createContext(turnContext);
         const results = await dialogContext.continueDialog();
@@ -46,51 +55,64 @@ class IterationDialog extends ComponentDialog {
      * Starts dialog conversation with the bot.
      * @param {WaterfallStepContext} stepContext
      */
-    async choiceIterationDate(stepContext) {
-        console.log('MainDialog.choiceIterationDate');
-
-        const key = 'iterationDateTimeChoice';
-
-        // Prompt the user with the configured PromptOptions.
-        return await stepContext.prompt(key, options(key, stepContext));
+    async initialStep(stepContext) {
+        console.log('MainDialog.initialStep');
+        const stepOptions = options(CHOICE_PRESENTED_OPTION_ITERATION_ACTIVITY, stepContext);
+        return await stepContext.prompt(CHOICE_PRESENTED_OPTION_ITERATION_ACTIVITY, stepOptions);
     }
 
     /**
-     * Confirm or reject selected date and time.
+     * Redirects dialog workflow according to selected iteration option.
      * @param {WaterfallStepContext} stepContext
      */
-    async confirmSelectedDate(stepContext) {
-        console.log('MainDialog.confirmSelectedDate');
+    async redirectIterationDialogStep(stepContext) {
+        console.log('MainDialog.redirectIterationDialogStep');
+        let nextDialogId = '';
 
-        const key = 'iterationSaveConfirmPrompt';
-        this.dialogState.iterationDate = new Date(stepContext.result.value);
-
-        return await stepContext.prompt(key, options(key, stepContext));
-    }
-
-    /**
-     * Finishes dialog with saving selected notification date and time.
-     * @param {WaterfallStepContext} stepContext
-     */
-    async displaySelectedDate(stepContext) {
-        console.log('MainDialog.displaySelectedDate');
-
-        switch (stepContext.result) {
-        case true:
-            await stepContext.context.sendActivity(`New Iteration notification will appear on ${ this.dialogState.iterationDate }.`);
+        switch (stepContext.result.value) {
+        case 'add':
+            nextDialogId = ADD_ITERATION_WATERFALL_DIALOG;
             break;
-        case false:
-            await stepContext.context.sendActivity(`Let me know when you'll decide to schedule a new notification.`);
+        case 'edit':
+            nextDialogId = EDIT_ITERATION_WATERFALL_DIALOG;
+            break;
+        case 'remove':
+            nextDialogId = REMOVE_ITERATION_WATERFALL_DIALOG;
             break;
         default:
-            await stepContext.context.sendActivity('Is that mean Yes?');
-            return await this.confirmSelectedDate();
+            return await stepContext.replaceDialog(this.id);
         }
-        this.finishCallback(this.dialogState);
 
-        // Give the user instructions about what to do next
-        await stepContext.context.sendActivity('Buy! :)');
-        return await stepContext.endDialog();
+        return await stepContext.prompt(nextDialogId);
+    }
+
+    /**
+     * Starts dialog conversation with the bot.
+     * @param {WaterfallStepContext} stepContext
+     */
+    async finalStep(stepContext) {
+        console.log('MainDialog.finalStep');
+
+        if (stepContext.result) {
+            switch (stepContext.result.action) {
+            case 'DELETE':
+            case 'EDIT':
+            case 'ADD':
+                break;
+            default:
+                await stepContext.context.sendActivity(
+                    `Sorry, something went wrong :( Please сontact Yuri Kabernik-Berazouski to help you solve this problem.`
+                );
+                return await stepContext.endDialog();
+            }
+
+            if (typeof (this.finishCallback) === 'function') {
+                await this.finishCallback(stepContext.result);
+            }
+        }
+        await stepContext.context.sendActivity(
+            `Let me know when you'll decide to schedule, delete or update any iteration info.`
+        );
     }
 }
 

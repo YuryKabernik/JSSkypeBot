@@ -24,12 +24,14 @@ class SkypeBot extends ActivityHandler {
 
     _assignOnMessageAction() {
         this.onMessage(async (context, next) => {
-            if (context.commands && context.commands.length) {
-                await this.executeCommands(context, context.commands);
-            } else if (!context.activity.conversation.isGroup) {
-                await this.continueDialog(context);
-                await this.answerOnRemoteWorkMessage(context);
+            if (!context.activity.conversation.isGroup) {
+                if (context.commands && context.commands.length) {
+                    await this.executeCommands(context, context.commands);
+                } else {
+                    await this.continueDialog(context);
+                }
             }
+            await this.answerOnRemoteWorkMessage(context);
             await next();
         });
     }
@@ -116,9 +118,6 @@ class SkypeBot extends ActivityHandler {
     }
 
     async executeCommands(context, commands = []) {
-        if (this.botState.conversationInProgress) {
-            return;
-        }
         const commandIncluded = commands.find(command => command.name === 'iteration');
         if (commandIncluded) {
             const command = commands.find(command => command.name === 'iteration');
