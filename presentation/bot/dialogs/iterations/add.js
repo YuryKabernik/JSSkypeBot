@@ -89,8 +89,9 @@ class AddIterationDialog extends ComponentDialog {
      */
     async collectSelectedDateStep(stepContext) {
         console.log('AddIterationDialog.collectSelectedDateStep');
-        if (stepContext.result) {
-            stepContext.values.iteration.date = new Date(stepContext.result);
+        const iteration = stepContext.values.iteration;
+        if (stepContext.result && stepContext.result[0]) {
+            iteration.date = new Date(stepContext.result[0].value);
         }
         const stepOptions = options(CONFIRM_INPUT_ON_ADD, stepContext);
         return await stepContext.prompt(CONFIRM_INPUT_ON_ADD, stepOptions);

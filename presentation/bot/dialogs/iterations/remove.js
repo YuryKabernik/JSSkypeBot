@@ -32,24 +32,32 @@ class RemoveIterationDialog extends ComponentDialog {
      */
     async choiceIterationFromListStep(stepContext) {
         console.log('RemoveIterationDialog.choiceIterationFromListStep');
-        const stepOptions = options(CHOICE_PRESENTED_OPTION, stepContext);
 
         const iterationsRepo = Injection.getInstance('DAL.IterationRepository');
         const allIteration = await iterationsRepo.all();
 
-        stepOptions.choices = allIteration.map((iteration, index) => {
-            return {
-                value: iteration,
-                action: {
-                    type: 'imBack',
-                    title: `Date: ${ iteration.date } Path: ${ iteration.path }`,
-                    value: iteration
-                },
-                synonyms: [index, iteration.id, iteration.path]
-            };
-        });
+        if (allIteration && allIteration.length) {
+            const stepOptions = options(CHOICE_PRESENTED_OPTION, stepContext);
 
-        return await stepContext.prompt(CHOICE_PRESENTED_OPTION, stepOptions);
+            stepContext.values.avaliableIterations = allIteration;
+            stepOptions.choices = allIteration.map((iteration, index) => {
+                return {
+                    value: iteration.id,
+                    action: {
+                        type: 'imBack',
+                        title: `Date: ${ iteration.date } Path: ${ iteration.path }`,
+                        value: iteration.id
+                    },
+                    synonyms: [iteration.id, iteration.path]
+                };
+            });
+
+            return await stepContext.prompt(CHOICE_PRESENTED_OPTION, stepOptions);
+        }
+        await stepContext.context.sendActivity(
+            'Unfortunately there are no registered iterations to delete.'
+        );
+        return await stepContext.endDialog();
     }
 
     /**
@@ -59,11 +67,13 @@ class RemoveIterationDialog extends ComponentDialog {
     async confirmSelectionStep(stepContext) {
         console.log('RemoveIterationDialog.confirmSelectedDate');
 
-        const iteration = stepContext.result.value || {};
-        const stepOptions = options(CONFIRM_INPUT, stepContext);
+        const selectedIterationId = stepContext.result.value || '';
+        const selectedIteration = stepContext.values.avaliableIterations
+            .find(iter => iter.id === selectedIterationId);
 
-        stepOptions.prompt = `Should I remove iteration of Date: ${ iteration.date } Path: ${ iteration.path } ?`;
-        stepContext.values.iteration = stepContext.result.value;
+        const stepOptions = options(CONFIRM_INPUT, stepContext);
+        stepOptions.prompt = `Should I remove iteration of Date: ${ selectedIteration.date } Path: ${ selectedIteration.path } ?`;
+        stepContext.values.iteration = selectedIteration;
 
         return await stepContext.prompt(CONFIRM_INPUT, stepOptions);
     }

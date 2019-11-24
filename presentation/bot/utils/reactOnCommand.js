@@ -39,6 +39,8 @@ async function onIterationDialogFinish(dialogState, result) {
     const iterationsRepo = Injection.getInstance('DAL.IterationRepository');
     const iterationsManager = Injection.getInstance('SkypeBot.NewIteration');
 
+    dialogState.lastDialog = null;
+
     switch (result.action) {
     case 'DELETE':
         await iterationsRepo.remove(result.iteration.id);
@@ -53,5 +55,4 @@ async function onIterationDialogFinish(dialogState, result) {
     default:
         break;
     }
-    dialogState.lastDialog = null;
 };

@@ -68,22 +68,27 @@ class IterationDialog extends ComponentDialog {
     async redirectIterationDialogStep(stepContext) {
         console.log('MainDialog.redirectIterationDialogStep');
         let nextDialogId = '';
+        if (stepContext.result) {
+            switch (stepContext.result.value) {
+            case 'add':
+                nextDialogId = ADD_ITERATION_WATERFALL_DIALOG;
+                break;
+            case 'edit':
+                nextDialogId = EDIT_ITERATION_WATERFALL_DIALOG;
+                break;
+            case 'remove':
+                nextDialogId = REMOVE_ITERATION_WATERFALL_DIALOG;
+                break;
+            default:
+                return await stepContext.replaceDialog(this.id);
+            }
 
-        switch (stepContext.result.value) {
-        case 'add':
-            nextDialogId = ADD_ITERATION_WATERFALL_DIALOG;
-            break;
-        case 'edit':
-            nextDialogId = EDIT_ITERATION_WATERFALL_DIALOG;
-            break;
-        case 'remove':
-            nextDialogId = REMOVE_ITERATION_WATERFALL_DIALOG;
-            break;
-        default:
-            return await stepContext.replaceDialog(this.id);
+            return await stepContext.prompt(nextDialogId);
         }
-
-        return await stepContext.prompt(nextDialogId);
+        await stepContext.context.sendActivity(
+            `Let me know when you'll decide to schedule, delete or update any iteration info.`
+        );
+        return await stepContext.endDialog();
     }
 
     /**
@@ -111,8 +116,10 @@ class IterationDialog extends ComponentDialog {
             }
         }
         await stepContext.context.sendActivity(
-            `Let me know when you'll decide to schedule, delete or update any iteration info.`
+            `The dialogue is over, thanks for participating :)
+            Let me know when you'll decide to schedule, delete or update any iteration info.`
         );
+        return await stepContext.endDialog();
     }
 }
 

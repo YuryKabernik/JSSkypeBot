@@ -1,6 +1,7 @@
 const { ChoicePrompt, ConfirmPrompt, ComponentDialog, DateTimePrompt, NumberPrompt, WaterfallDialog } = require('botbuilder-dialogs');
 const Injection = require('../../../../configuration/registerTypes.js');
 const { options } = require('./options.js');
+const { editIterationCallback } = require('./utils/editIterationCallback.js');
 
 const CHOICE_PRESENTED_OPTION_WHAT_ITERATION_TO_EDIT = 'CHOICE_PRESENTED_OPTION_WHAT_ITERATION_TO_EDIT';
 const CHOICE_PRESENTED_OPTION_WHAT_PROPERTY_TO_EDIT = 'CHOICE_PRESENTED_OPTION_WHAT_PROPERTY_TO_EDIT';
@@ -40,24 +41,31 @@ class EditIterationDialog extends ComponentDialog {
      */
     async choiceIterationFromListStep(stepContext) {
         console.log('EditIterationDialog.choiceIterationFromListStep');
-        const stepOptions = options(CHOICE_PRESENTED_OPTION_WHAT_ITERATION_TO_EDIT, stepContext);
 
         const iterationsRepo = Injection.getInstance('DAL.IterationRepository');
         const allIteration = await iterationsRepo.all();
 
-        stepOptions.choices = allIteration.map((iteration, index) => {
-            return {
-                value: iteration,
-                action: {
-                    type: 'imBack',
-                    title: `Date: ${ iteration.date } Path: ${ iteration.path }`,
-                    value: iteration
-                },
-                synonyms: [index, iteration.id, iteration.path]
-            };
-        });
+        if (allIteration && allIteration.length) {
+            const stepOptions = options(CHOICE_PRESENTED_OPTION_WHAT_ITERATION_TO_EDIT, stepContext);
 
-        return await stepContext.prompt(CHOICE_PRESENTED_OPTION_WHAT_ITERATION_TO_EDIT, stepOptions);
+            stepContext.values.avaliableIterations = allIteration;
+            stepOptions.choices = allIteration.map((iteration) => {
+                return {
+                    value: iteration.id,
+                    action: {
+                        title: `Date: ${ iteration.date } Path: ${ iteration.path }`,
+                        value: iteration.id
+                    },
+                    synonyms: [iteration.id, iteration.path]
+                };
+            });
+
+            return await stepContext.prompt(CHOICE_PRESENTED_OPTION_WHAT_ITERATION_TO_EDIT, stepOptions);
+        }
+        await stepContext.context.sendActivity(
+            'Unfortunately, there are no registered iterations to modify.'
+        );
+        return await stepContext.endDialog();
     }
 
     /**
@@ -66,9 +74,11 @@ class EditIterationDialog extends ComponentDialog {
      */
     async choicePropertyStep(stepContext) {
         console.log('EditIterationDialog.choicePropertyStep');
-        stepContext.values.iterationId =
-            (stepContext.result.value && stepContext.result.value.id) || '';
-        stepContext.values.iterationModified = stepContext.result.value || {};
+        const selectedIterationId = stepContext.result.value || '';
+        stepContext.values.iterationId = selectedIterationId;
+        stepContext.values.iterationModified = stepContext.values.avaliableIterations
+            .find(iter => iter.id === selectedIterationId);
+
         const stepOptions = options(
             CHOICE_PRESENTED_OPTION_WHAT_PROPERTY_TO_EDIT,
             stepContext
@@ -87,37 +97,21 @@ class EditIterationDialog extends ComponentDialog {
         console.log('EditIterationDialog.editPropertyStep');
         let promptKey = '';
         let stepOptions = {};
-        let updateIterationCallback = null;
 
         switch (stepContext.result.value) {
         case 'date':
             promptKey = INPUT_DATE_AND_TIME;
             stepOptions = options(promptKey, stepContext);
-            updateIterationCallback = (value, stepContext) => {
-                const previousDate = stepContext.values.iterationModified.date;
-                stepContext.values.iterationModified.date =
-                    new Date(value).toString();
-                stepContext.context.sendActivity(
-                    `Date was changed from ${ previousDate } to ${ value }`
-                );
-            };
             break;
         case 'path':
             promptKey = NUMBER_PROMPT_ITERATION_PATH;
             stepOptions = options(promptKey, stepContext);
-            updateIterationCallback = (value, stepContext) => {
-                const previousPath = stepContext.values.iterationModified.path;
-                stepContext.values.iterationModified.path = value;
-                stepContext.context.sendActivity(
-                    `Path was changed from ${ previousPath } to ${ value }`
-                );
-            };
             break;
         default:
             return await stepContext.repromptDialog();
         }
 
-        stepContext.values.updateIterationCallback = updateIterationCallback;
+        stepContext.options.propertyName = stepContext.result.value;
         return await stepContext.prompt(promptKey, stepOptions);
     }
 
@@ -128,9 +122,8 @@ class EditIterationDialog extends ComponentDialog {
     async confirmChangeStep(stepContext) {
         console.log('EditIterationDialog.confirmChangeStep');
 
-        if (stepContext.values.updateIterationCallback) {
-            stepContext.values.updateIterationCallback(
-                stepContext.result,
+        if (stepContext.options.propertyName) {
+            await editIterationCallback[stepContext.options.propertyName](
                 stepContext
             );
         }
