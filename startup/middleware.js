@@ -2,13 +2,15 @@
  * @file Middlware array initialization.
  */
 const ProactiveMiddleware = require('../middleware/proactive.js');
+const PromptMiddleware = require('../middleware/prompt.js');
 
 /**
  * Register proactive middlewares.
  */
 module.exports.Register = (adapter) => {
     const middlewares = [
-        ProactiveMiddleware.trustServiceUrl
+        ProactiveMiddleware.trustServiceUrl,
+        PromptMiddleware.promptParser
     ];
 
     if (middlewares && middlewares.every(middleware => typeof (middleware) === 'function')) {

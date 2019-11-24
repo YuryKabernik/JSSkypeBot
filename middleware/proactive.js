@@ -2,7 +2,7 @@
  * @file Proactive messaging processing middleware.
  */
 const { MicrosoftAppCredentials } = require('botframework-connector');
-const { ActivityTypes } = require('botframework-schema');
+const { ActivityTypes } = require('botbuilder');
 
 /**
  * Restores service trust to the conversation activity.
