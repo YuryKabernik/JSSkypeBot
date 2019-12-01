@@ -1,7 +1,7 @@
 const dotenv = require('dotenv');
 const path = require('path');
 const restify = require('restify');
-const { start } = require('./startup/startupApplication.js');
+const { start } = require('./src/startup/startupApplication.js');
 
 // Import required bot configuration.
 const ENV_FILE = path.join(__dirname, '.env');
