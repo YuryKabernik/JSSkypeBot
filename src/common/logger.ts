@@ -1,10 +1,16 @@
+import { ILogger } from "./interfaces/ILogger";
 
-class Logger {
-    constructor(moduleName) {
+/**
+ * Logs application errors to console window. 
+ */
+export class Logger implements ILogger {
+    public loggedModuleName: String;
+
+    constructor(moduleName: String) {
         this.loggedModuleName = moduleName;
     }
 
-    logInfo(message = '') {
+    logInfo(message = ''): void {
         const prefix = `INFO:[${ this.loggedModuleName }]`;
         const dateTimeNow = new Date();
         const timeStamp = dateTimeNow.toLocaleTimeString();
@@ -12,7 +18,7 @@ class Logger {
         console.info(`${ prefix } --- ${ dateStamp } ${ timeStamp } --- ${ message } \n`);
     }
 
-    logError(message = '') {
+    logError(message = ''): void {
         const prefix = `ERROR:[${ this.loggedModuleName }]`;
         const dateTimeNow = new Date();
         const timeStamp = dateTimeNow.toLocaleTimeString();
@@ -20,5 +26,3 @@ class Logger {
         console.error(`${ prefix } --- ${ dateStamp } ${ timeStamp } --- ${ message } \n`);
     }
 }
-
-module.exports.Logger = Logger;
