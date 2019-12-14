@@ -1,7 +1,13 @@
-const Injection = require('../configuration/registerTypes.js');
-const { Iterations } = require('./Queries/iterations.js');
+import { Injection } from '../configuration/registerTypes.js';
+import * as Iterations from './Queries/iterations.js';
+import { ILogger } from "../common/interfaces/ILogger";
+import { IDbClient } from '../services/interfaces/IDbClient.js';
+import { IIteration } from './interfaces/IIteration.js';
 
-class IterationRepository {
+export class IterationRepository {
+    private _logger: ILogger;
+    private _dbClient: IDbClient;
+
     constructor() {
         this._logger = Injection.getInstance('Common.Logger', 'ReferenceRepository');
         this._dbClient = Injection.getInstance('Services.DbClient', 'ReferenceRepository');
@@ -20,7 +26,7 @@ class IterationRepository {
         });
     }
 
-    async getById(id) {
+    async getById(id: string) {
         let result = null;
         try {
             result = await this._dbClient.request(Iterations.GetIterationById, id);
@@ -30,7 +36,7 @@ class IterationRepository {
         return result && (result.recordset || [])[0];
     }
 
-    async includes(id) {
+    async includes(id: string) {
         let result = null;
         try {
             result = await this._dbClient.request(Iterations.IsIterationIncluded, id);
@@ -43,13 +49,9 @@ class IterationRepository {
 
     /**
      * Saves iteration by provided id.
-     * @param {Object} iteration Iteration data that need to be stored.
-     * @param {String} iteration.id Iteration id.
-     * @param {Object} iteration.data Iteration data.
-     * @param {String} iteration.data.path The name of iteration that should be displayed to the user.
-     * @param {Date|String} iteration.data.date DateTime of iteration creation.
+     * @param {IIteration} iteration Iteration data that need to be stored.
      */
-    async save(iteration) {
+    async save(iteration: IIteration) {
         let result = null;
         try {
             result = await this._dbClient.request(
@@ -68,7 +70,7 @@ class IterationRepository {
         return result;
     }
 
-    async remove(id) {
+    async remove(id: string) {
         let result = null;
         try {
             result = await this._dbClient.request(Iterations.RemoveIteration, id);
@@ -81,5 +83,3 @@ class IterationRepository {
         return result;
     }
 }
-
-module.exports.IterationRepository = IterationRepository;

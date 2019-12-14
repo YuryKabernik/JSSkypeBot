@@ -1,7 +1,12 @@
-const Injection = require('../configuration/registerTypes.js');
-const { GetReferenceById, GetAllReferences, SaveReference } = require('./Queries/references.js');
+import { Injection } from '../configuration/registerTypes.js';
+import { GetReferenceById, GetAllReferences, SaveReference } from './Queries/references.js';
+import { ILogger } from '../common/interfaces/ILogger.js';
+import { IDbClient } from '../services/interfaces/IDbClient.js';
 
-class ReferenceRepository {
+export class ReferenceRepository {
+    private _logger: ILogger;
+    readonly _dbClient: IDbClient;
+
     constructor() {
         this._logger = Injection.getInstance('Common.Logger', 'ReferenceRepository');
         this._dbClient = Injection.getInstance('Services.DbClient');
@@ -20,7 +25,7 @@ class ReferenceRepository {
         });
     }
 
-    async getById(conversationId) {
+    async getById(conversationId: string) {
         let result = null;
         try {
             result = await this._dbClient.request(GetReferenceById, conversationId);
@@ -33,7 +38,7 @@ class ReferenceRepository {
         })[0];
     }
 
-    async save(reference) {
+    async save(reference: any) {
         let result = null;
         try {
             result = await this._dbClient.request(SaveReference, reference);
@@ -46,5 +51,3 @@ class ReferenceRepository {
         return result;
     }
 }
-
-module.exports.ReferenceRepository = ReferenceRepository;

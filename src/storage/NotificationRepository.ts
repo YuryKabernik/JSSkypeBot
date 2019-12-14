@@ -1,7 +1,12 @@
-const Injection = require('../configuration/registerTypes.js');
-const { Weekly } = require('./Queries/notifications.js');
+import { INotification } from "./interfaces/INotification";
+import { Injection } from "../configuration/registerTypes.js";
+import { ILogger } from "../common/interfaces/ILogger";
+import * as Notifiactions from "./Queries/notifications.js";
 
-class NotificationRepository {
+export class NotificationRepository {
+    private _logger: ILogger;
+    _dbClient: any;
+
     constructor() {
         this._logger = Injection.getInstance('Common.Logger', 'ReferenceRepository');
         this._dbClient = Injection.getInstance('Services.DbClient', 'ReferenceRepository');
@@ -10,30 +15,30 @@ class NotificationRepository {
     async all() {
         let result = null;
         try {
-            result = await this._dbClient.request(Weekly.GetAllNotifications);
+            result = await this._dbClient.request(Notifiactions.GetAllNotifications);
         } catch (error) {
             this._logger.logError(error);
         }
-        return (result.recordset || []).map(record => {
+        return (result.recordset || []).map((record: { Id: any; ExecutionDate: any; UserMessage: any; CreationDate: any; }) => {
             const { Id, ExecutionDate, UserMessage, CreationDate } = record;
             return { id: Id, date: ExecutionDate, message: UserMessage, creationDate: CreationDate };
         });
     }
 
-    async getById(id) {
+    async getById(id: string) {
         let result = null;
         try {
-            result = await this._dbClient.request(Weekly.GetNotificationById, id);
+            result = await this._dbClient.request(Notifiactions.GetNotificationById, id);
         } catch (error) {
             this._logger.logError(error);
         }
         return (result.recordset || [])[0];
     }
 
-    async includes(id) {
+    async includes(id: string) {
         let result = null;
         try {
-            result = await this._dbClient.request(Weekly.IsNotificationIncluded, id);
+            result = await this._dbClient.request(Notifiactions.IsNotificationIncluded, id);
         } catch (error) {
             this._logger.logError(error);
         }
@@ -49,14 +54,14 @@ class NotificationRepository {
      * @param {Object} [notification.data.userMessage] Message that should be displayed to the user.
      * @param {Object} [notification.data.creationDate] DateTime of notification creation.
      */
-    async save(notification) {
+    async save(notificationData: INotification) {
         let result = null;
         try {
             result = await this._dbClient.request(
-                Weekly.SaveNotification,
+                Notifiactions.SaveNotification,
                 {
-                    id: notification.id,
-                    notification: notification.data
+                    id: notificationData.id,
+                    notification: notificationData.notification
                 }
             );
         } catch (error) {
@@ -68,10 +73,10 @@ class NotificationRepository {
         return result;
     }
 
-    async remove(id) {
+    async remove(id: string) {
         let result = null;
         try {
-            result = await this._dbClient.request(Weekly.RemoveNotification, id);
+            result = await this._dbClient.request(Notifiactions.RemoveNotification, id);
         } catch (error) {
             this._logger.logError(error);
         }
@@ -81,5 +86,3 @@ class NotificationRepository {
         return result;
     }
 }
-
-module.exports.NotificationRepository = NotificationRepository;

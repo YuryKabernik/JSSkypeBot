@@ -1,7 +1,11 @@
-const sql = require('mssql');
+/**
+ * @file References - contains stored procedure requests to 'references' table.
+ */
 
-module.exports.GetReferenceById = function GetReferenceById(connection, id) {
-    const request = new sql.Request(connection);
+import { ConnectionPool } from "mssql";
+
+export function GetReferenceById(connection: ConnectionPool, id: string) {
+    const request = connection.request();
     request.input('ConversationId', id);
     return {
         execute: async () => await request
@@ -9,7 +13,7 @@ module.exports.GetReferenceById = function GetReferenceById(connection, id) {
     };
 };
 
-module.exports.GetAllReferences = function GetAllReferences(connection, amount = 100) {
+export function GetAllReferences(connection: ConnectionPool, amount: number = 100) {
     return {
         execute: async () => await connection
             .request()
@@ -18,7 +22,7 @@ module.exports.GetAllReferences = function GetAllReferences(connection, amount =
     };
 };
 
-module.exports.SaveReference = function SaveReference(connection, reference) {
+export function SaveReference(connection: ConnectionPool, reference: any) {
     return {
         execute: async () => await connection
             .request()
