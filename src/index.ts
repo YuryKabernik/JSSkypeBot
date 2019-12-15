@@ -1,7 +1,7 @@
-const dotenv = require('dotenv');
-const path = require('path');
-const restify = require('restify');
-const { start } = require('./src/startup/startupApplication.js');
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+import * as restify from 'restify';
+import { start } from './startup/startupApplication.js';
 
 // Import required bot configuration.
 const ENV_FILE = path.join(__dirname, '.env');
@@ -18,7 +18,7 @@ server
     .use(restify.plugins.bodyParser({ mapParams: false }))
     .listen(process.env.port || process.env.PORT || 3978, () => {
         start(server);
-        console.info(`${ server.name } listening to ${ server.url }`);
+        console.info(`${server.name} listening to ${server.url}`);
         console.info(`Get Bot Framework Emulator: https://aka.ms/botframework-emulator`);
         console.info(`To test your bot, see: https://aka.ms/debug-with-emulator`);
     });

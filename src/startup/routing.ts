@@ -1,15 +1,15 @@
 /**
  * @file Routing - executes routing to the specific server endpoint.
  */
-const { apiRoutes } = require('../presentation/api/api.js');
+import { apiRoutes } from '../presentation/api/api.js';
+import { Server } from "restify";
 
-module.exports.Routing = {
+export default {
     /**
      * Registers an array of routes on proviede server.
      * @param {Server} server Target server object.
-     * @param {Function} routes Function that will register routes.
      */
-    Register(server) {
+    Register(server: Server) {
         apiRoutes(server.router);
     }
 };
