@@ -1,8 +1,12 @@
-const Injection = require('../../configuration/registerTypes.js');
-const keyPhrases = require('./keyPhrases/gotSickToday.json');
-const { answers } = require('./textAnswers/answers.js');
+import {Injection} from '../../configuration/registerTypes';
+import * as keyPhrases from './keyPhrases/gotSickToday.json';
+import answers from './textAnswers/answers.js';
+import { AnswersFormatter } from '../answersFormatter';
 
-class IllnessAnswering {
+export class IllnessAnswering {
+
+    readonly answersFormatter: AnswersFormatter;
+
     constructor() {
         this.answersFormatter = Injection.getInstance('Common.AnswersFormatter', answers);
     }
@@ -26,11 +30,9 @@ class IllnessAnswering {
 
     isContainsIllnessPhrase(message = '') {
         message = message.toLowerCase();
-        const sickPhraseGroups = Object.keys(keyPhrases);
-        const remoteWorkPhrases = sickPhraseGroups.reduce(
-            (result, key) => result.concat(keyPhrases[key]),
-            []
-        ).map(phrase => phrase.toLowerCase());
+        const remoteWorkPhrases = []
+            .concat(keyPhrases.halfDaySickLeave,keyPhrases.sickLeaveToday, keyPhrases.sickLeaveTomorrow, keyPhrases.sickToday)
+            .map(phrase => phrase.toLowerCase());
         return remoteWorkPhrases.some(keyPhrase => message.includes(keyPhrase));
     }
 }

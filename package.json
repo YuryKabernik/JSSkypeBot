@@ -29,6 +29,8 @@
         "uuid": "^3.3.3"
     },
     "devDependencies": {
+        "@types/node-cron": "^2.0.2",
+        "@types/uuid": "^3.4.6",
         "eslint": "^6.0.1",
         "eslint-config-standard": "^13.0.1",
         "eslint-plugin-import": "^2.18.2",

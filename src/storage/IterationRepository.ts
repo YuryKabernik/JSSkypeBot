@@ -13,7 +13,7 @@ export class IterationRepository {
         this._dbClient = Injection.getInstance('Services.DbClient', 'ReferenceRepository');
     }
 
-    async all() {
+    async all(): Promise<IIteration[]> {
         let result = null;
         try {
             result = await this._dbClient.request(Iterations.GetAllIterations);

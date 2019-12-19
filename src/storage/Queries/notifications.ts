@@ -21,14 +21,14 @@ export function GetAllNotifications(connection: ConnectionPool, amount: number =
             .execute('GetAllWeeklyNotifications')
     };
 };
-export function SaveNotification(connection: ConnectionPool, { id, notification }: INotification) {
+export function SaveNotification(connection: ConnectionPool, { id, content }: INotification) {
     return {
         execute: async () => await connection
             .request()
             .input('id', id)
-            .input('executionDate', notification.date)
-            .input('userMessage', NVarChar, notification.message)
-            .input('creationDate', notification.creationDate)
+            .input('executionDate', content.date)
+            .input('userMessage', NVarChar, content.message)
+            .input('creationDate', content.creationDate)
             .execute('SaveWeeklyNotification')
     };
 };

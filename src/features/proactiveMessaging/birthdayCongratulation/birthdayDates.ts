@@ -1,4 +1,4 @@
-module.exports.birthdayDates = {
+export const birthdayDates = {
     'WLN Enhancements': [
         {
             name: 'Alexey Gazduke',

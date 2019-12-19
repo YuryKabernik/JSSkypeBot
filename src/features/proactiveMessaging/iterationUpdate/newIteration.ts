@@ -1,10 +1,25 @@
-const cron = require('node-cron');
-const { guid } = require('../utils/guid.js');
-const Injection = require('../../../configuration/registerTypes.js');
-const { answers } = require('../messageProperties/answers.js');
-const { cronDateExpression } = require('../utils/cronDateExpression.js');
+import { ConversationReference, TurnContext } from 'botbuilder';
+import * as cron from 'node-cron';
+import { Timezone } from 'tz-offset';
+import { ILogger } from "../../../common/interfaces/ILogger";
+import { Injection } from '../../../configuration/registerTypes';
+import { IIterationInfo } from "../../../storage/interfaces/IIteration";
+import { IterationRepository } from '../../../storage/IterationRepository';
+import { ReferenceRepository } from '../../../storage/ReferenceRepository';
+import { AnswersFormatter } from '../../answersFormatter';
+import answers from '../messageProperties/answers';
+import { cronDateExpression } from '../utils/cronDateExpression';
+import { guid } from '../utils/guid';
+import { ScheduledTask } from '../../models/proactive';
 
-class NewIteration {
+export class NewIteration {
+    readonly scheduledIterationNotifications: ScheduledTask[];
+    readonly logger: ILogger;
+    readonly iterations: IterationRepository;
+    readonly conversationReferences: ReferenceRepository;
+    readonly answersFormatter: AnswersFormatter;
+    
+    
     constructor() {
         this.scheduledIterationNotifications = [];
         this.logger = Injection.getInstance('Common.Logger', __filename);
@@ -13,7 +28,7 @@ class NewIteration {
         this.answersFormatter = Injection.getInstance('Common.AnswersFormatter', answers);
     }
 
-    async addIterations(iterations = []) {
+    async addIterations(iterations: IIterationInfo[] = []) {
         for (let index = 0; index < iterations.length; index++) {
             const iteration = iterations[index];
             const id = guid(`${ iteration.path } ${ iteration.date }`);
@@ -25,7 +40,7 @@ class NewIteration {
         }
     }
 
-    async schedule(sendEventCallback) {
+    async schedule(sendEventCallback: Function) {
         const conversationReferences = await this.conversationReferences.all();
         for (let index = 0; index < conversationReferences.length; index++) {
             const reference = conversationReferences[index];
@@ -33,14 +48,18 @@ class NewIteration {
         }
     }
 
-    async scheduleNewIterationsNotification(conversationReference, sendEventCallback) {
+    async scheduleNewIterationsNotification(conversationReference: ConversationReference, sendEventCallback: Function) {
         const avaliableIterations = await this.iterations.all();
         avaliableIterations.forEach(iteration => {
-            const dateExpression = cronDateExpression(iteration);
+            const dateExpression = cronDateExpression(iteration.data.date);
+            const scheduleOptions: cron.ScheduleOptions = {
+                timezone: process.env.Timezone as Timezone
+            };
+
             const scheduledCongradulation = cron.schedule(dateExpression, () => {
-                sendEventCallback(conversationReference, async (turnContext) => {
+                sendEventCallback(conversationReference, async (turnContext: TurnContext) => {
                     try {
-                        const message = this.answersFormatter.format('transferItemsToIteration', { name: iteration.path });
+                        const message = this.answersFormatter.format('transferItemsToIteration', { name: iteration.data.path });
                         await turnContext.sendActivity(message);
                     } catch (error) {
                         this.logger.logError(
@@ -51,26 +70,27 @@ class NewIteration {
                         await this.iterations.remove(iteration.id);
                     }
                 });
-            }, { timezone: process.env.Timezone });
+            }, scheduleOptions);
 
-            const scheduledEventExists = this.scheduledIterationNotifications.findIndex(task => task.taskId === iteration.id);
-            if (scheduledEventExists !== -1) {
+            const scheduledEventExists = this.scheduledIterationNotifications.find(task => task.id === iteration.id);
+            if (scheduledEventExists) {
                 this.logger.logInfo(`Sheduled iteration event already exists: CRON-DATE-TIME:[${ dateExpression }]`);
                 scheduledCongradulation.destroy();
             } else {
                 this.logger.logInfo(`New iteration event scheduled: CRON-DATE-TIME:[${ dateExpression }]`);
-                this.scheduledIterationNotifications.push({ taskId: iteration.id, scheduledCongradulation });
+                this.scheduledIterationNotifications.push({
+                    id: iteration.id,
+                    cronTask: scheduledCongradulation
+                });
             }
         });
     }
 
-    _removeSheduledCongradulation(taskId, scheduledCongradulation) {
+    _removeSheduledCongradulation(id: string, scheduledCongradulation: cron.ScheduledTask) {
         scheduledCongradulation.destroy();
-        const indexOfConfiguration = this.scheduledIterationNotifications.findIndex(notification => notification.taskId === taskId);
+        const indexOfConfiguration = this.scheduledIterationNotifications.findIndex(notification => notification.id === id);
         if (indexOfConfiguration !== -1) {
             this.scheduledIterationNotifications.splice(indexOfConfiguration, 1);
         }
     }
 }
-
-module.exports.NewIteration = NewIteration;

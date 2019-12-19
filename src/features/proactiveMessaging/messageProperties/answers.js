@@ -1,5 +1,5 @@
-const fs = require('fs');
-const { parse } = require('dot-properties');
+import fs from 'fs';
+import { parse } from 'dot-properties';
 
 const answers = {};
 
@@ -17,4 +17,4 @@ const answers = {};
     }
 })();
 
-module.exports.answers = answers;
+export default answers;

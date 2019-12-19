@@ -12,7 +12,7 @@ export class NotificationRepository {
         this._dbClient = Injection.getInstance('Services.DbClient', 'ReferenceRepository');
     }
 
-    async all() {
+    async all(): Promise<INotification[]> {
         let result = null;
         try {
             result = await this._dbClient.request(Notifiactions.GetAllNotifications);
@@ -25,7 +25,7 @@ export class NotificationRepository {
         });
     }
 
-    async getById(id: string) {
+    async getById(id: string): Promise<INotification> {
         let result = null;
         try {
             result = await this._dbClient.request(Notifiactions.GetNotificationById, id);
@@ -35,7 +35,7 @@ export class NotificationRepository {
         return (result.recordset || [])[0];
     }
 
-    async includes(id: string) {
+    async includes(id: string): Promise<Boolean> {
         let result = null;
         try {
             result = await this._dbClient.request(Notifiactions.IsNotificationIncluded, id);
@@ -54,14 +54,14 @@ export class NotificationRepository {
      * @param {Object} [notification.data.userMessage] Message that should be displayed to the user.
      * @param {Object} [notification.data.creationDate] DateTime of notification creation.
      */
-    async save(notificationData: INotification) {
+    async save(notificationData: INotification): Promise<Boolean> {
         let result = null;
         try {
             result = await this._dbClient.request(
                 Notifiactions.SaveNotification,
                 {
                     id: notificationData.id,
-                    notification: notificationData.notification
+                    content: notificationData.content
                 }
             );
         } catch (error) {
@@ -73,7 +73,7 @@ export class NotificationRepository {
         return result;
     }
 
-    async remove(id: string) {
+    async remove(id: string): Promise<Boolean> {
         let result = null;
         try {
             result = await this._dbClient.request(Notifiactions.RemoveNotification, id);

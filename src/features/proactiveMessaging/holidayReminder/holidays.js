@@ -1,4 +1,4 @@
-module.exports.holidays = [
+export default [
     {
         name: 'День программиста!',
         date: new Date(2019, 8, 12, 7, 30, 10),
@@ -11,7 +11,7 @@ module.exports.holidays = [
     },
     {
         name: 'День Октябрьской реворлюции!',
-        date: new Date(2019, 11, 7, 7, 30, 10),
+        date: new Date(2019, 10, 7, 7, 30, 10),
         selebration: 'С днём великой октябрьской революции, товарищи!'
     },
     {
@@ -21,7 +21,7 @@ module.exports.holidays = [
     },
     {
         name: 'Новый год!',
-        date: new Date(2020, 0, 1, 7, 30, 10),
+        date: new Date(2020, 0, 1, 0, 0, 10),
         selebration: 'С НОВЫМ ГОДОМ!!! *-*'
     },
     {

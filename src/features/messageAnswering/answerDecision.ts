@@ -1,14 +1,19 @@
-const Injection = require('../../configuration/registerTypes.js');
-const keyPhrases = require('./keyPhrases/remoteWorkPhrases.json');
-const { answers } = require('./textAnswers/answers.js');
+import { AnswersFormatter } from "../answersFormatter";
+import {Injection} from '../../configuration/registerTypes';
+import * as keyPhrases from './keyPhrases/remoteWorkPhrases.json';
+import { answers } from './textAnswers/answers';
 
-class AnswerDecision {
-    constructor(botId) {
+export class AnswerDecision {
+    
+    botId: string;
+    answersFormatter: AnswersFormatter;
+    
+    constructor(botId: string) {
         this.botId = botId;
         this.answersFormatter = Injection.getInstance('Common.AnswersFormatter', answers);
     }
 
-    answerOnMembersRemoteWork(message, userName) {
+    answerOnMembersRemoteWork(message: string, userName: string) {
         message = message.toLowerCase();
         const remoteWorkPhrases = keyPhrases.continueRemoteWork.concat(
             keyPhrases.startRemoteWork,
@@ -19,17 +24,15 @@ class AnswerDecision {
         }
     }
 
-    answerToRemovedMember(removedMemberId, removedMemberName, botId) {
+    answerToRemovedMember(removedMemberId: string, removedMemberName: string, botId: string) {
         return removedMemberId !== (this.botId || botId) ?
             this.answersFormatter.format('goodbyeToTheUser', { name: removedMemberName }) :
             this.answersFormatter.lookup('botRemoveLastWords');
     }
 
-    answerToNewMember(newMemberId, botId) {
+    answerToNewMember(newMemberId: string, botId: string) {
         return newMemberId !== (this.botId || botId) ?
             `${ this.answersFormatter.lookup('welcomToTheWLNTeam') } ${ this.answersFormatter.lookup('teamIntroduction') }` :
             this.answersFormatter.lookup('botIntroductionSerious');
     }
 }
-
-module.exports.AnswerDecision = AnswerDecision;
