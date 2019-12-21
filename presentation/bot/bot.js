@@ -31,7 +31,6 @@ class SkypeBot extends ActivityHandler {
                     await this.continueDialog(context);
                 }
             }
-            await this.answerOnRemoteWorkMessage(context);
             await next();
         });
     }
