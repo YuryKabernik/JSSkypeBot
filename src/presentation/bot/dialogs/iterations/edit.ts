@@ -1,3 +1,7 @@
+import { WaterfallStepContext } from "botbuilder-dialogs";
+import { IterationRepository } from "../../../../storage/IterationRepository";
+import { IIteration } from "../../../../storage/interfaces/IIteration";
+
 const { ChoicePrompt, ConfirmPrompt, ComponentDialog, DateTimePrompt, NumberPrompt, WaterfallDialog } = require('botbuilder-dialogs');
 const Injection = require('../../../../configuration/registerTypes.js');
 const { options } = require('./options.js');
@@ -9,8 +13,8 @@ const NUMBER_PROMPT_ITERATION_PATH = 'NUMBER_PROMPT_ITERATION_PATH';
 const INPUT_DATE_AND_TIME = 'INPUT_DATE_AND_TIME';
 const CONFIRM_CONTINUE_EDITING = 'CONFIRM_CONTINUE_EDITING';
 
-class EditIterationDialog extends ComponentDialog {
-    constructor(EDIT_ITERATION_WATERFALL_DIALOG, finishCallback) {
+export class EditIterationDialog extends ComponentDialog {
+    constructor(EDIT_ITERATION_WATERFALL_DIALOG: string, finishCallback?: Function) {
         super(EDIT_ITERATION_WATERFALL_DIALOG);
 
         this.finishCallback = finishCallback;
@@ -39,24 +43,24 @@ class EditIterationDialog extends ComponentDialog {
      * Ask user to select an iteration to proceed.
      * @param {WaterfallStepContext} stepContext
      */
-    async choiceIterationFromListStep(stepContext) {
+    async choiceIterationFromListStep(stepContext: WaterfallStepContext) {
         console.log('EditIterationDialog.choiceIterationFromListStep');
 
-        const iterationsRepo = Injection.getInstance('DAL.IterationRepository');
-        const allIteration = await iterationsRepo.all();
+        const iterationsRepo: IterationRepository = Injection.getInstance('DAL.IterationRepository');
+        const allIterations = await iterationsRepo.all();
 
-        if (allIteration && allIteration.length) {
+        if (allIterations && allIterations.length) {
             const stepOptions = options(CHOICE_PRESENTED_OPTION_WHAT_ITERATION_TO_EDIT, stepContext);
 
-            stepContext.values.avaliableIterations = allIteration;
-            stepOptions.choices = allIteration.map((iteration) => {
+            stepContext.values['avaliableIterations'] = allIterations;
+            stepOptions.choices = allIterations.map((iteration) => {
                 return {
                     value: iteration.id,
                     action: {
-                        title: `Date: ${ iteration.date } Path: ${ iteration.path }`,
+                        title: `Date: ${ iteration.data.date } Path: ${ iteration.data.path }`,
                         value: iteration.id
                     },
-                    synonyms: [iteration.id, iteration.path]
+                    synonyms: [iteration.id, iteration.data.path]
                 };
             });
 
@@ -72,11 +76,11 @@ class EditIterationDialog extends ComponentDialog {
      * Ask user to select a property that will be canged.
      * @param {WaterfallStepContext} stepContext
      */
-    async choicePropertyStep(stepContext) {
+    async choicePropertyStep(stepContext: WaterfallStepContext) {
         console.log('EditIterationDialog.choicePropertyStep');
-        const selectedIterationId = stepContext.result.value || '';
-        stepContext.values.iterationId = selectedIterationId;
-        stepContext.values.iterationModified = stepContext.values.avaliableIterations
+        const selectedIterationId: string = stepContext.result.value || '';
+        stepContext.values['iterationId'] = selectedIterationId;
+        stepContext.values['iterationModified'] = (stepContext.values['avaliableIterations'] as IIteration[])
             .find(iter => iter.id === selectedIterationId);
 
         const stepOptions = options(
@@ -93,7 +97,7 @@ class EditIterationDialog extends ComponentDialog {
      * Branch on iteration property selection.
      * @param {WaterfallStepContext} stepContext
      */
-    async editPropertyStep(stepContext) {
+    async editPropertyStep(stepContext: WaterfallStepContext) {
         console.log('EditIterationDialog.editPropertyStep');
         let promptKey = '';
         let stepOptions = {};
@@ -111,7 +115,7 @@ class EditIterationDialog extends ComponentDialog {
             return await stepContext.repromptDialog();
         }
 
-        stepContext.options.propertyName = stepContext.result.value;
+        stepContext.values['propertyName'] = stepContext.result.value;
         return await stepContext.prompt(promptKey, stepOptions);
     }
 
@@ -119,11 +123,11 @@ class EditIterationDialog extends ComponentDialog {
      * Confirm change on selected property.
      * @param {WaterfallStepContext} stepContext
      */
-    async confirmChangeStep(stepContext) {
+    async confirmChangeStep(stepContext: WaterfallStepContext) {
         console.log('EditIterationDialog.confirmChangeStep');
 
-        if (stepContext.options.propertyName) {
-            await editIterationCallback[stepContext.options.propertyName](
+        if (stepContext.values['propertyName']) {
+            await editIterationCallback[stepContext.values['propertyName']](
                 stepContext
             );
         }
@@ -136,14 +140,14 @@ class EditIterationDialog extends ComponentDialog {
      * Finish modification process.
      * @param {WaterfallStepContext} stepContext
      */
-    async finishStep(stepContext) {
+    async finishStep(stepContext: WaterfallStepContext) {
         console.log('EditIterationDialog.finishStep');
-
+        let iteration: IIteration;
         switch (stepContext.result) {
         case true:
-            const iteration = stepContext.values.iterationModified;
+            iteration = stepContext.values['iterationModified'] as IIteration;
             await stepContext.context.sendActivity(
-                `Iteration notification will be modified. Date: ${ iteration.date } Path: ${ iteration.path }.`
+                `Iteration notification will be modified. Date: ${ iteration.data.date } Path: ${ iteration.data.path }.`
             );
             break;
         case false:
@@ -163,11 +167,9 @@ class EditIterationDialog extends ComponentDialog {
             await this.finishCallback();
         }
         return await stepContext.endDialog({
-            previousId: stepContext.values.iterationId,
-            iteration: stepContext.values.iterationModified,
+            previousId: iteration.id,
+            iteration: iteration,
             action: 'EDIT'
         });
     }
 }
-
-module.exports.EditIterationDialog = EditIterationDialog;

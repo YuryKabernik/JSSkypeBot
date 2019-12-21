@@ -17,7 +17,7 @@ import { dbConnection } from '../configuration/dbConnection.js';
 import { botAdapter } from './botAdapter';
 import { MemoryStorage } from 'botbuilder';
 
-let injector: Container = null;
+let injector!: Container;
 
 export function registerTypes() {
     if (!injector) {
@@ -41,7 +41,7 @@ export function registerTypes() {
         injector.register('SkypeBot.WeeklyReminder', new WeeklyReminder());
         injector.register('SkypeBot.State', new StateManagement());
 
-        injector.register('Bot.SkypeBot', new SkypeBot());
+        injector.register('Bot.SkypeBot', new SkypeBot(''));
         injector.register('Bot.Adapter', botAdapter());
     }
     return (typeName: string, ...args: any[]) => Injection.getInstance(typeName, ...args);

@@ -1,0 +1,3 @@
+class Command {
+    name!: string;
+} 

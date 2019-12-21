@@ -1,11 +1,20 @@
-const { ActivityHandler } = require('botbuilder');
-const { reactOnCommand, continueBotDialog } = require('./utils/reactOnCommand.js');
-const { birthdayDates } = require('../../features/proactiveMessaging/birthdayCongratulation/birthdayDates.js');
-const { holidays } = require('../../features/proactiveMessaging/holidayReminder/holidays.js');
-const Injection = require('../../configuration/registerTypes.js');
+import { ActivityHandler, TurnContext } from 'botbuilder';
+import { reactOnCommand, continueBotDialog } from './utils/reactOnCommand.js';
+import { birthdayDates } from '../../features/proactiveMessaging/birthdayCongratulation/birthdayDates.js';
+import { holidays } from '../../features/proactiveMessaging/holidayReminder/holidays.js';
+import { Injection } from '../../configuration/registerTypes.js';
 
-class SkypeBot extends ActivityHandler {
-    constructor(botId) {
+export class SkypeBot extends ActivityHandler {
+    id: string;
+    readonly botState: any;
+    readonly holidays: any;
+    readonly answerDecision: any;
+    readonly iterationsNotification: any;
+    readonly illnessAnswering: any;
+    readonly congratulator: any;
+    readonly weeklyReminder: any;
+
+    constructor(botId: string) {
         super();
         this.id = botId;
         this.botState = Injection.getInstance('SkypeBot.State');
@@ -23,15 +32,15 @@ class SkypeBot extends ActivityHandler {
     }
 
     _assignOnMessageAction() {
-        this.onMessage(async (context, next) => {
+        this.onMessage(async (context: TurnContext, next) => {
             if (!context.activity.conversation.isGroup) {
-                if (context.commands && context.commands.length) {
-                    await this.executeCommands(context, context.commands);
+                const commands = context.turnState.get('commands');
+                if (commands && commands.length) {
+                    await this.executeCommands(context, commands);
                 } else {
                     await this.continueDialog(context);
                 }
             }
-            await this.answerOnRemoteWorkMessage(context);
             await next();
         });
     }
@@ -51,7 +60,7 @@ class SkypeBot extends ActivityHandler {
 
     _assignOnMembersRemovedAction() {
         this.onMembersRemoved(async (context, next) => {
-            const membersRemoved = context.activity.membersRemoved;
+            const membersRemoved = context.activity.membersRemoved || [];
             for (let cnt = 0; cnt < membersRemoved.length; ++cnt) {
                 const memberId = membersRemoved[cnt].id;
                 const memberName = membersRemoved[cnt].name;
@@ -70,7 +79,7 @@ class SkypeBot extends ActivityHandler {
 
     _assignOnMembersAdded() {
         this.onMembersAdded(async (context, next) => {
-            const membersAdded = context.activity.membersAdded;
+            const membersAdded = context.activity.membersAdded || [];
             for (let cnt = 0; cnt < membersAdded.length; ++cnt) {
                 const welcomMessage = this.answerDecision.answerToNewMember(
                     membersAdded[cnt].id,
@@ -91,7 +100,7 @@ class SkypeBot extends ActivityHandler {
         });
     }
 
-    async answerOnRemoteWorkMessage(context) {
+    async answerOnRemoteWorkMessage(context: TurnContext) {
         if (context.activity.text) {
             const memberName = context.activity.from.name;
             const botMessage = this.answerDecision
@@ -102,7 +111,7 @@ class SkypeBot extends ActivityHandler {
         }
     }
 
-    async answerOnSickLeaveMessage(context) {
+    async answerOnSickLeaveMessage(context: TurnContext) {
         if (context.activity.text) {
             const memberName = context.activity.from.name;
             const botMessage = this.illnessAnswering
@@ -113,17 +122,14 @@ class SkypeBot extends ActivityHandler {
         }
     }
 
-    async continueDialog(context) {
+    async continueDialog(context: TurnContext) {
         await continueBotDialog(context, this.botState);
     }
 
-    async executeCommands(context, commands = []) {
-        const commandIncluded = commands.find(command => command.name === 'iteration');
-        if (commandIncluded) {
-            const command = commands.find(command => command.name === 'iteration');
+    async executeCommands(context: TurnContext, commands: Command[]) {
+        const command = commands.find(command => command.name === 'iteration');
+        if (command) {
             await reactOnCommand(command, context, this.botState);
         }
     }
 }
-
-module.exports.SkypeBot = SkypeBot;

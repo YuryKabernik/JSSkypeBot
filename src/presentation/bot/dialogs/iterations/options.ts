@@ -1,7 +1,9 @@
+import { WaterfallStepContext } from "botbuilder-dialogs";
+
 const { ListStyle } = require('botbuilder-dialogs');
 
-module.exports.options = function (key, stepContext) {
-    const options = {
+export function options(key: string) {
+    const options: any = {
         CHOICE_PRESENTED_OPTION_ITERATION_ACTIVITY_TYPE: {
             style: ListStyle.suggestedAction,
             prompt: 'What iteration notification would you like to setup? You can click or type the card name.',

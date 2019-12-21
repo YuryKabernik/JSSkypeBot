@@ -13,20 +13,23 @@ export class IterationRepository {
         this._dbClient = Injection.getInstance('Services.DbClient', 'ReferenceRepository');
     }
 
-    async all() {
+    async all(): Promise<IIteration[] | null> {
         let result = null;
         try {
             result = await this._dbClient.request(Iterations.GetAllIterations);
         } catch (error) {
             this._logger.logError(error);
         }
-        return result && (result.recordset || []).map(record => {
-            const { ID, Date, Path } = record;
-            return { id: ID, date: Date, path: Path };
-        });
+        if (result && result.recordset) {
+            return result.recordset.map(record => {
+                const { ID, Date, Path } = record;
+                return { id: ID, data: { date: Date, path: Path }};
+            });
+        }
+        return null;
     }
 
-    async getById(id: string) {
+    async getById(id: string): Promise<IIteration> {
         let result = null;
         try {
             result = await this._dbClient.request(Iterations.GetIterationById, id);
@@ -36,13 +39,13 @@ export class IterationRepository {
         return result && (result.recordset || [])[0];
     }
 
-    async includes(id: string) {
+    async includes(id: string): Promise<Boolean> {
         let result = null;
         try {
             result = await this._dbClient.request(Iterations.IsIterationIncluded, id);
         } catch (error) {
             this._logger.logError(error);
-            return result;
+            return false;
         }
         return result && result.output.isIncluded;
     }

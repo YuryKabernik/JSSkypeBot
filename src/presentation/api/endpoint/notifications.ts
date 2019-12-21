@@ -1,23 +1,33 @@
-const Injector = require('../../../configuration/registerTypes.js');
+import { BotFrameworkAdapter } from 'botbuilder';
+import { ILogger } from '../../../common/interfaces/ILogger.js';
+import { Injection } from '../../../configuration/registerTypes.js';
+import { Request, Response } from 'restify';
+import { SkypeBot } from '../../bot/bot.js';
 
-class Notifications {
+/**
+ * Notification REST controller
+ */
+export class Notifications {
+    readonly sendEventCallback: (conversationReference: any, asyncCallback: any) => any;
+    readonly adapter: BotFrameworkAdapter;
+    readonly skypeBot: SkypeBot;
+    readonly logger: ILogger;
+
     constructor() {
-        this.adapter = Injector.getInstance('Bot.Adapter');
-        this.skypeBot = Injector.getInstance('Bot.SkypeBot');
-        this.logger = Injector.getInstance('Common.Logger', __filename);
+        this.adapter = Injection.getInstance('Bot.Adapter');
+        this.skypeBot = Injection.getInstance('Bot.SkypeBot');
+        this.logger = Injection.getInstance('Common.Logger', __filename);
 
         // Proactive messaging callback.
-        this.sendEventCallback = (conversationReference, asyncCallback) =>
+        this.sendEventCallback = (conversationReference: any, asyncCallback: any) =>
             this.adapter.continueConversation(conversationReference, asyncCallback);
     }
 
     /**
-     * Listen for incomming information about new iterations notification
-     * @param {Request} req Request object.
-     * @param {Response} res Responce object.
+     * Listen for incomming information about new iterations notification.
      */
-    async iterations(req, res) {
-        this.logger.logInfo(`New iterations income ${ JSON.stringify(req.body) }`);
+    async iterations(req: Request, res: Response) {
+        this.logger.logInfo(`New iterations income ${JSON.stringify(req.body)}`);
         try {
             let iterations = [];
             if (req.body && typeof req.body === 'object') {
@@ -35,8 +45,11 @@ class Notifications {
         sendResponse(res, 200, 'New Iterations have been sheduled!');
     }
 
-    async weekly(req, res) {
-        this.logger.logInfo(`New weekly events income ${ JSON.stringify(req.body) }`);
+    /**
+     * Listen for incomming information about new weekly notification.
+     */
+    async weekly(req: Request, res: Response) {
+        this.logger.logInfo(`New weekly events income ${JSON.stringify(req.body)}`);
         try {
             let weekEvents = [];
             if (req.body && typeof req.body === 'object') {
@@ -55,11 +68,9 @@ class Notifications {
     }
 }
 
-function sendResponse(res, statusCode, errMessage) {
+function sendResponse(res: Response, statusCode: number, errMessage: string) {
     res.setHeader('Content-Type', 'text/html');
     res.writeHead(statusCode);
-    res.write(`<html><body><h1>${ errMessage }</h1></body></html>`);
+    res.write(`<html><body><h1>${errMessage}</h1></body></html>`);
     res.end();
 }
-
-module.exports.Notifications = Notifications;

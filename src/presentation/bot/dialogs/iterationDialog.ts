@@ -1,18 +1,22 @@
 // Import some of the capabities from the module.
-const { ComponentDialog, ChoicePrompt, DialogSet, DialogTurnStatus, WaterfallDialog } = require('botbuilder-dialogs');
-const { options } = require('./iterations/options.js');
-const { RemoveIterationDialog } = require('./iterations/remove.js');
-const { EditIterationDialog } = require('./iterations/edit.js');
-const { AddIterationDialog } = require('./iterations/add.js');
+import { ComponentDialog, ChoicePrompt, DialogSet, DialogTurnStatus, WaterfallDialog, DialogContext, WaterfallStepContext } from 'botbuilder-dialogs';
+import { options } from './iterations/options';
+import { RemoveIterationDialog } from './iterations/remove';
+import { EditIterationDialog } from './iterations/edit';
+import { AddIterationDialog } from './iterations/add';
+import { TurnContext, StatePropertyAccessor } from 'botbuilder';
 
 const CHOICE_PRESENTED_OPTION_ITERATION_ACTIVITY = 'CHOICE_PRESENTED_OPTION_ITERATION_ACTIVITY_TYPE';
 
-const REMOVE_ITERATION_WATERFALL_DIALOG = 'REMOVE_ITERATION_WATERFALL_DIALOG';
-const EDIT_ITERATION_WATERFALL_DIALOG = 'EDIT_ITERATION_WATERFALL_DIALOG';
-const ADD_ITERATION_WATERFALL_DIALOG = 'ADD_ITERATION_WATERFALL_DIALOG';
+const REMOVE_ITERATION_WATERFALL_DIALOG: string = 'REMOVE_ITERATION_WATERFALL_DIALOG';
+const EDIT_ITERATION_WATERFALL_DIALOG: string = 'EDIT_ITERATION_WATERFALL_DIALOG';
+const ADD_ITERATION_WATERFALL_DIALOG: string = 'ADD_ITERATION_WATERFALL_DIALOG';
 
-class IterationDialog extends ComponentDialog {
-    constructor(MAIN_ITERATION_WATERFALL_DIALOG, finishCallback) {
+export class IterationDialog extends ComponentDialog {
+
+    private finishCallback: Function;
+
+    constructor(MAIN_ITERATION_WATERFALL_DIALOG: string, finishCallback: Function) {
         super(MAIN_ITERATION_WATERFALL_DIALOG);
 
         this.finishCallback = finishCallback;
@@ -40,7 +44,7 @@ class IterationDialog extends ComponentDialog {
      * @param {TurnContext} turnContext
      * @param {DialogState} dialogState
      */
-    async run(turnContext, dialogState) {
+    async run(turnContext: TurnContext, dialogState: StatePropertyAccessor) {
         const dialogSet = new DialogSet(dialogState);
         dialogSet.add(this);
 
@@ -55,9 +59,9 @@ class IterationDialog extends ComponentDialog {
      * Starts dialog conversation with the bot.
      * @param {WaterfallStepContext} stepContext
      */
-    async initialStep(stepContext) {
+    async initialStep(stepContext: WaterfallStepContext) {
         console.log('MainDialog.initialStep');
-        const stepOptions = options(CHOICE_PRESENTED_OPTION_ITERATION_ACTIVITY, stepContext);
+        const stepOptions = options(CHOICE_PRESENTED_OPTION_ITERATION_ACTIVITY);
         return await stepContext.prompt(CHOICE_PRESENTED_OPTION_ITERATION_ACTIVITY, stepOptions);
     }
 
@@ -65,25 +69,25 @@ class IterationDialog extends ComponentDialog {
      * Redirects dialog workflow according to selected iteration option.
      * @param {WaterfallStepContext} stepContext
      */
-    async redirectIterationDialogStep(stepContext) {
+    async redirectIterationDialogStep(stepContext: WaterfallStepContext) {
         console.log('MainDialog.redirectIterationDialogStep');
         let nextDialogId = '';
         if (stepContext.result) {
             switch (stepContext.result.value) {
-            case 'add':
-                nextDialogId = ADD_ITERATION_WATERFALL_DIALOG;
-                break;
-            case 'edit':
-                nextDialogId = EDIT_ITERATION_WATERFALL_DIALOG;
-                break;
-            case 'remove':
-                nextDialogId = REMOVE_ITERATION_WATERFALL_DIALOG;
-                break;
-            default:
-                return await stepContext.replaceDialog(this.id);
+                case 'add':
+                    nextDialogId = ADD_ITERATION_WATERFALL_DIALOG;
+                    break;
+                case 'edit':
+                    nextDialogId = EDIT_ITERATION_WATERFALL_DIALOG;
+                    break;
+                case 'remove':
+                    nextDialogId = REMOVE_ITERATION_WATERFALL_DIALOG;
+                    break;
+                default:
+                    return await stepContext.replaceDialog(this.id);
             }
 
-            return await stepContext.prompt(nextDialogId);
+            return await stepContext.beginDialog(nextDialogId);
         }
         await stepContext.context.sendActivity(
             `Let me know when you'll decide to schedule, delete or update any iteration info.`
@@ -95,20 +99,20 @@ class IterationDialog extends ComponentDialog {
      * Starts dialog conversation with the bot.
      * @param {WaterfallStepContext} stepContext
      */
-    async finalStep(stepContext) {
+    async finalStep(stepContext: WaterfallStepContext) {
         console.log('MainDialog.finalStep');
 
         if (stepContext.result) {
             switch (stepContext.result.action) {
-            case 'DELETE':
-            case 'EDIT':
-            case 'ADD':
-                break;
-            default:
-                await stepContext.context.sendActivity(
-                    `Sorry, something went wrong :( Please сontact Yuri Kabernik-Berazouski to help you solve this problem.`
-                );
-                return await stepContext.endDialog();
+                case 'DELETE':
+                case 'EDIT':
+                case 'ADD':
+                    break;
+                default:
+                    await stepContext.context.sendActivity(
+                        `Sorry, something went wrong :( Please сontact Yuri Kabernik-Berazouski to help you solve this problem.`
+                    );
+                    return await stepContext.endDialog();
             }
 
             if (typeof (this.finishCallback) === 'function') {
@@ -122,5 +126,3 @@ class IterationDialog extends ComponentDialog {
         return await stepContext.endDialog();
     }
 }
-
-module.exports.IterationDialog = IterationDialog;
