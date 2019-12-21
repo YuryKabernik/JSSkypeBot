@@ -1,7 +1,8 @@
-import { Injection } from '../configuration/registerTypes.js';
-import { GetReferenceById, GetAllReferences, SaveReference } from './Queries/references.js';
+import { ConversationReference } from 'botbuilder';
 import { ILogger } from '../common/interfaces/ILogger.js';
+import { Injection } from '../configuration/registerTypes.js';
 import { IDbClient } from '../services/interfaces/IDbClient.js';
+import { GetAllReferences, GetReferenceById, SaveReference } from './Queries/references.js';
 
 export class ReferenceRepository {
     private _logger: ILogger;
@@ -12,7 +13,7 @@ export class ReferenceRepository {
         this._dbClient = Injection.getInstance('Services.DbClient');
     }
 
-    async all() {
+    async all(): Promise<ConversationReference[]> {
         let result = null;
         try {
             result = await this._dbClient.request(GetAllReferences);

@@ -1,8 +1,8 @@
 import { ActivityHandler, TurnContext } from 'botbuilder';
-import { reactOnCommand, continueBotDialog } from './utils/reactOnCommand.js';
-import { birthdayDates } from '../../features/proactiveMessaging/birthdayCongratulation/birthdayDates.js';
-import { holidays } from '../../features/proactiveMessaging/holidayReminder/holidays.js';
-import { Injection } from '../../configuration/registerTypes.js';
+import { reactOnCommand, continueBotDialog } from './utils/reactOnCommand';
+import { birthdayDates } from '../../features/proactiveMessaging/birthdayCongratulation/birthdayDates';
+import { holidays } from '../../features/proactiveMessaging/holidayReminder/holidays';
+import { Injection } from '../../configuration/registerTypes';
 
 export class SkypeBot extends ActivityHandler {
     id: string;

@@ -1,10 +1,10 @@
 export interface INotification {
     id: string,
-    notification: INotificationContent
+    content: INotificationContent
 }
 
 export interface INotificationContent {
     date: Date,
     message: string,
-    creationDate: Date
+    creationDate: string
 }

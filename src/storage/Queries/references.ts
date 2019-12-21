@@ -3,6 +3,7 @@
  */
 
 import { ConnectionPool } from "mssql";
+import { ConversationReference } from "botbuilder";
 
 export function GetReferenceById(connection: ConnectionPool, id: string) {
     const request = connection.request();
@@ -22,7 +23,7 @@ export function GetAllReferences(connection: ConnectionPool, amount: number = 10
     };
 };
 
-export function SaveReference(connection: ConnectionPool, reference: any) {
+export function SaveReference(connection: ConnectionPool, reference: ConversationReference) {
     return {
         execute: async () => await connection
             .request()

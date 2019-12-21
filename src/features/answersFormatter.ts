@@ -1,13 +1,25 @@
-class AnswersFormatter {
-    constructor(initialAnswers) {
+/**
+ * Returns a simple of formated text by provided key.
+ */
+export class AnswersFormatter {
+    readonly answers: any;
+
+    constructor(initialAnswers: string[]) {
         this.answers = initialAnswers;
     }
 
-    lookup(propertyKey) {
+    /**
+     * Returns simple string by key.
+     * @param {*} propertyKey 
+     */
+    lookup(propertyKey: string) {
         return (propertyKey && typeof propertyKey) === 'string' ? this.answers[propertyKey] : '';
     }
 
-    format(propertyKey, data = {}) {
+    /**
+    * Returns formatted string with inserted values into strings by key.
+    */
+    format(propertyKey: string, data: any = {}) {
         if (propertyKey && typeof propertyKey === 'string') {
             let answer = this.answers[propertyKey] || '';
             const propNames = Object.getOwnPropertyNames(data);
@@ -23,5 +35,3 @@ class AnswersFormatter {
         return '';
     }
 };
-
-module.exports.AnswersFormatter = AnswersFormatter;

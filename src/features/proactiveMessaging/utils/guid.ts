@@ -1,8 +1,8 @@
 /**
  * @file Guid - generates unique guid by provided key.
  */
-const uuid = require('uuid/v5');
+import * as uuid from 'uuid/v5';
 
-module.exports.guid = function (key) {
+export function guid(key: string) {
     return uuid(key, process.env.MicrosoftAppId);
 };
