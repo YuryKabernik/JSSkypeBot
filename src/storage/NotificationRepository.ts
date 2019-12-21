@@ -1,7 +1,7 @@
 import { INotification } from "./interfaces/INotification";
-import { Injection } from "../configuration/registerTypes.js";
+import { Injection } from "../configuration/registerTypes";
 import { ILogger } from "../common/interfaces/ILogger";
-import * as Notifiactions from "./Queries/notifications.js";
+import * as Notifiactions from "./Queries/notifications";
 
 export class NotificationRepository {
     private _logger: ILogger;

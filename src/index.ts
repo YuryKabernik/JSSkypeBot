@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as restify from 'restify';
-import { start } from './startup/startupApplication.js';
+import { start } from './startup/startupApplication';
 
 // Import required bot configuration.
 const ENV_FILE = path.join(__dirname, '.env');

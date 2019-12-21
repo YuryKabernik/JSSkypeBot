@@ -1,8 +1,8 @@
-import { Injection } from '../configuration/registerTypes.js';
-import * as Iterations from './Queries/iterations.js';
+import { Injection } from '../configuration/registerTypes';
+import * as Iterations from './Queries/iterations';
 import { ILogger } from "../common/interfaces/ILogger";
-import { IDbClient } from '../services/interfaces/IDbClient.js';
-import { IIteration } from './interfaces/IIteration.js';
+import { IDbClient } from '../services/interfaces/IDbClient';
+import { IIteration } from './interfaces/IIteration';
 
 export class IterationRepository {
     private _logger: ILogger;

@@ -1,7 +1,7 @@
-import { IDbClient } from "./interfaces/IDbClient";
 import { ConnectionPool } from "mssql";
 import { ILogger } from "../common/interfaces/ILogger";
 import { Injection } from "../configuration/registerTypes";
+import { IDbClient } from "./interfaces/IDbClient";
 
 /**
  * Implementation of DB client request execution.

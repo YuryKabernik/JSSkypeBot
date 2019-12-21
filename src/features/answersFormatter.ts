@@ -4,7 +4,7 @@
 export class AnswersFormatter {
     readonly answers: any;
 
-    constructor(initialAnswers: string[]) {
+    constructor(...initialAnswers: string[]) {
         this.answers = initialAnswers;
     }
 

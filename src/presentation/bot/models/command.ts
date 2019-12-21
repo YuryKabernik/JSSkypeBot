@@ -1,3 +1,3 @@
-class Command {
-    name!: string;
+export interface Command {
+    name: string;
 } 

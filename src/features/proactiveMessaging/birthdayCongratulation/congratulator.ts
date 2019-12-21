@@ -24,6 +24,10 @@ export class Сongratulator {
 
     async schedule(sendEventCallback: Function) {
         const conversationReferences = await this.conversationReferences.all();
+        if (!conversationReferences || !conversationReferences.length) {
+            this.logger.logInfo('No available conversation references.')
+            return;
+        }
         conversationReferences.forEach(conversationReference => {
             const congradulatinGroupExists =
                 conversationReference.conversation.name &&

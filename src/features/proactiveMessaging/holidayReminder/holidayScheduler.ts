@@ -19,12 +19,17 @@ export class HolidaySheduler {
     constructor(holidays: Holiday[]) {
         this.holidays = holidays;
         this.scheduledCongradulations = [];
+        this.logger = Injection.getInstance('Common.Logger', 'HolidaySheduler');
         this.conversationReferences = Injection.getInstance('DAL.ReferenceRepository');
         this.months = monthList;
     }
 
     async schedule(sendEventCallback: Function) {
         const conversationReferences = await this.conversationReferences.all();
+        if (!conversationReferences || !conversationReferences.length) {
+            this.logger.logInfo('No available conversation references.')
+            return;
+        }
         conversationReferences.forEach((conversationReference: ConversationReference) => {
             this.scheduleHolidaysCongraduloations(conversationReference, sendEventCallback);
         });

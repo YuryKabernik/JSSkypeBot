@@ -9,7 +9,7 @@ import { ReferenceRepository } from "../../../storage/ReferenceRepository";
 import { AnswersFormatter } from "../../answersFormatter";
 import answers from '../messageProperties/answers';
 import { cronWeekExpression } from '../utils/cronWeekExpression';
-import { guid } from '../utils/guid.js';
+import { guid } from '../utils/guid';
 
 export class WeeklyReminder {
     readonly notifications: NotificationRepository;
@@ -45,6 +45,10 @@ export class WeeklyReminder {
 
     async schedule(sendEventCallback: Function) {
         const references = await this.conversationReferences.all();
+        if (!references || !references.length) {
+            this.logger.logInfo('No available conversation references.')
+            return;
+        }
         for (let index = 0; index < references.length; index++) {
             const reference = references[index];
             this.logger.logInfo(`Sheduling weekly event on conversationReference:[${ JSON.stringify(reference) }]`);

@@ -30,9 +30,12 @@ export class IllnessAnswering {
 
     isContainsIllnessPhrase(message = '') {
         message = message.toLowerCase();
-        const remoteWorkPhrases = []
-            .concat(keyPhrases.halfDaySickLeave,keyPhrases.sickLeaveToday, keyPhrases.sickLeaveTomorrow, keyPhrases.sickToday)
-            .map(phrase => phrase.toLowerCase());
+        const remoteWorkPhrases = [
+            ...keyPhrases.sickLeaveTomorrow,
+            ...keyPhrases.halfDaySickLeave,
+            ...keyPhrases.sickLeaveToday,
+            ...keyPhrases.sickToday
+        ].map(phrase => phrase.toLowerCase());
         return remoteWorkPhrases.some(keyPhrase => message.includes(keyPhrase));
     }
 }

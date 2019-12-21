@@ -1,7 +1,7 @@
 /**
  * @file Routing - executes routing to the specific server endpoint.
  */
-import { apiRoutes } from '../presentation/api/api.js';
+import { apiRoutes } from '../presentation/api/api';
 import { Server } from "restify";
 
 export default {

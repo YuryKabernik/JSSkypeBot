@@ -42,6 +42,10 @@ export class NewIteration {
 
     async schedule(sendEventCallback: Function) {
         const conversationReferences = await this.conversationReferences.all();
+        if (!conversationReferences || !conversationReferences.length) {
+            this.logger.logInfo('No available conversation references.')
+            return;
+        }
         for (let index = 0; index < conversationReferences.length; index++) {
             const reference = conversationReferences[index];
             await this.scheduleNewIterationsNotification(reference, sendEventCallback);
@@ -50,6 +54,10 @@ export class NewIteration {
 
     async scheduleNewIterationsNotification(conversationReference: ConversationReference, sendEventCallback: Function) {
         const avaliableIterations = await this.iterations.all();
+        if (!avaliableIterations || !avaliableIterations.length) {
+            this.logger.logInfo('No available conversation references.')
+            return;
+        }
         avaliableIterations.forEach(iteration => {
             const dateExpression = cronDateExpression(iteration.data.date);
             const scheduleOptions: cron.ScheduleOptions = {

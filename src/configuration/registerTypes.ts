@@ -24,7 +24,7 @@ export function registerTypes() {
         injector = new Container();
 
         injector.register('Common.Logger', (moduleName: string) => new Logger(moduleName));
-        injector.register('Common.AnswersFormatter', (...args: any) => new AnswersFormatter(...args));
+        injector.register('Common.AnswersFormatter', (...args: any[]) => new AnswersFormatter(...args));
 
         injector.register('Services.DbClient', new DbClient(dbConnection()));
 
@@ -33,10 +33,10 @@ export function registerTypes() {
         injector.register('DAL.NotificationRepository', new NotificationRepository());
         injector.register('DAL.InMemory', new MemoryStorage());
 
-        injector.register('SkypeBot.TextAnswers', (...args: any) => new AnswerDecision(...args));
-        injector.register('SkypeBot.HolidaySheduler', (...args: any) => new HolidaySheduler(...args));
-        injector.register('SkypeBot.IllnessAnswering', (...args: any) => new IllnessAnswering());
-        injector.register('SkypeBot.Сongratulator', (...args: any) => new Сongratulator(...args));
+        injector.register('SkypeBot.TextAnswers', (...args: any[]) => new AnswerDecision(args[0]));
+        injector.register('SkypeBot.HolidaySheduler', (...args: any[]) => new HolidaySheduler(args));
+        injector.register('SkypeBot.IllnessAnswering', (...args: any[]) => new IllnessAnswering());
+        injector.register('SkypeBot.Сongratulator', (...args: any[]) => new Сongratulator(...args));
         injector.register('SkypeBot.NewIteration', new NewIteration());
         injector.register('SkypeBot.WeeklyReminder', new WeeklyReminder());
         injector.register('SkypeBot.State', new StateManagement());

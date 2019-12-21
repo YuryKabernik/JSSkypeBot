@@ -1,18 +1,25 @@
 import { ActivityHandler, TurnContext } from 'botbuilder';
-import { reactOnCommand, continueBotDialog } from './utils/reactOnCommand';
-import { birthdayDates } from '../../features/proactiveMessaging/birthdayCongratulation/birthdayDates';
-import { holidays } from '../../features/proactiveMessaging/holidayReminder/holidays';
 import { Injection } from '../../configuration/registerTypes';
+import { IllnessAnswering } from '../../features/messageAnswering/illnessAnswering';
+import { birthdayDates } from '../../features/proactiveMessaging/birthdayCongratulation/birthdayDates';
+import { Сongratulator } from '../../features/proactiveMessaging/birthdayCongratulation/congratulator';
+import * as holidays from '../../features/proactiveMessaging/holidayReminder/holidays';
+import { HolidaySheduler } from '../../features/proactiveMessaging/holidayReminder/holidayScheduler';
+import { NewIteration } from '../../features/proactiveMessaging/iterationUpdate/newIteration';
+import { WeeklyReminder } from '../../features/proactiveMessaging/weeklyReminder/weeklyReminder';
+import { continueBotDialog, reactOnCommand } from './utils/reactOnCommand';
+import { AnswerDecision } from '../../features/messageAnswering/answerDecision';
+import { Command } from './models/command';
 
 export class SkypeBot extends ActivityHandler {
     id: string;
     readonly botState: any;
-    readonly holidays: any;
-    readonly answerDecision: any;
-    readonly iterationsNotification: any;
-    readonly illnessAnswering: any;
-    readonly congratulator: any;
-    readonly weeklyReminder: any;
+    readonly holidays: HolidaySheduler;
+    readonly answerDecision: AnswerDecision;
+    readonly iterationsNotification: NewIteration;
+    readonly illnessAnswering: IllnessAnswering;
+    readonly congratulator: Сongratulator;
+    readonly weeklyReminder: WeeklyReminder;
 
     constructor(botId: string) {
         super();
@@ -115,7 +122,7 @@ export class SkypeBot extends ActivityHandler {
         if (context.activity.text) {
             const memberName = context.activity.from.name;
             const botMessage = this.illnessAnswering
-                .getAnswerMessage(context.activity.text, memberName);
+                .getAnswerMessage(context.activity.text);
             if (botMessage) {
                 await context.sendActivity(botMessage);
             }

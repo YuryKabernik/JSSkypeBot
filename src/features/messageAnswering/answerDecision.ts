@@ -1,7 +1,7 @@
 import { AnswersFormatter } from "../answersFormatter";
 import {Injection} from '../../configuration/registerTypes';
 import * as keyPhrases from './keyPhrases/remoteWorkPhrases.json';
-import { answers } from './textAnswers/answers';
+import answers from './textAnswers/answers.js';
 
 export class AnswerDecision {
     
