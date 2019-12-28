@@ -1,16 +1,12 @@
-import { ChoicePrompt, ComponentDialog, ConfirmPrompt, WaterfallDialog, WaterfallStepContext } from "botbuilder-dialogs";
+import { ChoicePrompt, ComponentDialog, ConfirmPrompt, WaterfallDialog } from 'botbuilder-dialogs';
 import { Injection } from '../../../../configuration/registerTypes';
 import { options } from './options';
-import { IIteration } from "../../../../storage/interfaces/IIteration";
 
 const CHOICE_PRESENTED_OPTION = 'CHOICE_PRESENTED_OPTION_REMOVE_ITERATION';
 const CONFIRM_INPUT = 'CONFIRM_INPUT_ON_REMOVE';
 
 export class RemoveIterationDialog extends ComponentDialog {
-
-    finishCallback?: Function;
-
-    constructor(REMOVE_ITERATION_WATERFALL_DIALOG: string, finishCallback?: Function) {
+    constructor(REMOVE_ITERATION_WATERFALL_DIALOG, finishCallback) {
         super(REMOVE_ITERATION_WATERFALL_DIALOG);
 
         this.finishCallback = finishCallback;
@@ -34,11 +30,11 @@ export class RemoveIterationDialog extends ComponentDialog {
      * Ask user to select an iteration to proceed.
      * @param {WaterfallStepContext} stepContext
      */
-    async choiceIterationFromListStep(stepContext: WaterfallStepContext) {
+    async choiceIterationFromListStep(stepContext) {
         console.log('RemoveIterationDialog.choiceIterationFromListStep');
 
         const iterationsRepo = Injection.getInstance('DAL.IterationRepository');
-        const allIteration: IIteration[] = await iterationsRepo.all();
+        const allIteration = await iterationsRepo.all();
 
         if (allIteration && allIteration.length) {
             const stepOptions = options(CHOICE_PRESENTED_OPTION);
@@ -49,7 +45,7 @@ export class RemoveIterationDialog extends ComponentDialog {
                     value: iteration.id,
                     action: {
                         type: 'imBack',
-                        title: `Date: ${iteration.data.date} Path: ${iteration.data.path}`,
+                        title: `Date: ${ iteration.data.date } Path: ${ iteration.data.path }`,
                         value: iteration.id
                     },
                     synonyms: [iteration.id, iteration.data.path]
@@ -68,15 +64,15 @@ export class RemoveIterationDialog extends ComponentDialog {
      *
      * @param {WaterfallStepContext} stepContext
      */
-    async confirmSelectionStep(stepContext: WaterfallStepContext) {
+    async confirmSelectionStep(stepContext) {
         console.log('RemoveIterationDialog.confirmSelectedDate');
 
         const selectedIterationId = stepContext.result.value || '';
-        const selectedIteration = (stepContext.values['avaliableIterations'] as IIteration[])
+        const selectedIteration = (stepContext.values['avaliableIterations'])
             .find(iter => iter.id === selectedIterationId);
 
         const stepOptions = options(CONFIRM_INPUT);
-        stepOptions.prompt = `Should I remove iteration of Date: ${selectedIteration?.data.date} Path: ${selectedIteration?.data.path} ?`;
+        stepOptions.prompt = `Should I remove iteration of Date: ${ selectedIteration.data.date } Path: ${ selectedIteration.data.path } ?`;
         stepContext.values['iteration'] = selectedIteration;
 
         return await stepContext.prompt(CONFIRM_INPUT, stepOptions);
@@ -86,21 +82,19 @@ export class RemoveIterationDialog extends ComponentDialog {
      *
      * @param {WaterfallStepContext} stepContext
      */
-    async finishStep(stepContext: WaterfallStepContext) {
+    async finishStep(stepContext) {
         console.log('RemoveIterationDialog.finishStep');
 
         switch (stepContext.result) {
-            case true:
-                const iteration = stepContext.values['iteration'] as IIteration;
-                await stepContext.context.sendActivity(
-                    `Iteration notification will be removed. Date: ${iteration.data.date} Path: ${iteration.data.path}.`
-                );
-                break;
-            case false:
-                return await stepContext.endDialog();
-            default:
-                await stepContext.context.sendActivity('Is that mean Yes?');
-                return await this.repromptDialog();
+        case true:
+            const iteration = stepContext.values['iteration'];
+            await stepContext.context.sendActivity(
+                `Iteration notification will be removed. Date: ${ iteration.data.date } Path: ${ iteration.data.path }.`
+            );
+            break;
+        case false:
+        default:
+            return await stepContext.endDialog();
         }
 
         if (typeof (this.finishCallback) === 'function') {

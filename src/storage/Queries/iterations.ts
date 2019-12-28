@@ -2,8 +2,8 @@
  * @file Iterations - contains stored procedure requests to 'iterations' table.
  */
 
-import { ConnectionPool, NVarChar, Bit } from "mssql";
-import { IIteration } from "../interfaces/IIteration";
+import { ConnectionPool, NVarChar, Bit } from 'mssql';
+import { IIteration } from '../interfaces/IIteration';
 
 export function GetIterationById(connection: ConnectionPool, id: string) {
     return {

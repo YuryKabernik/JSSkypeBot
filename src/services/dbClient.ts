@@ -1,4 +1,4 @@
-import { ConnectionPool } from "mssql";
+import { ConnectionPool } from 'mssql';
 import { ILogger } from "../common/interfaces/ILogger";
 import { Injection } from "../configuration/registerTypes";
 import { IDbClient } from "./interfaces/IDbClient";

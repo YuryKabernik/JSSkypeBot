@@ -1,6 +1,8 @@
-import { BotFrameworkAdapter } from "botbuilder";
-import { Server } from "restify";
+import { BotFrameworkAdapter } from 'botbuilder';
+import { Server } from 'restify';
+import { ILogger } from '../common/interfaces/ILogger';
 import { Injection, registerTypes } from "../configuration/registerTypes";
+import { SkypeBot } from '../presentation/bot/bot';
 import Middleware from './middleware';
 import { restoreScheduledEventsAsync } from "./restore";
 import Routing from './routing';
@@ -12,8 +14,8 @@ import Routing from './routing';
 export function start(server: Server) {
     registerTypes();
 
-    const logger = Injection.getInstance('Common.Logger', __filename);
-    const skypeBot = Injection.getInstance('Bot.SkypeBot');
+    const logger: ILogger = Injection.getInstance('Common.Logger', __filename);
+    const skypeBot: SkypeBot = Injection.getInstance('Bot.SkypeBot');
     const adapter: BotFrameworkAdapter = Injection.getInstance('Bot.Adapter');
 
     Middleware.Register(adapter);

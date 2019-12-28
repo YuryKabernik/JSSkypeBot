@@ -1,5 +1,3 @@
-import { WaterfallStepContext } from "botbuilder-dialogs";
-
 const { ListStyle } = require('botbuilder-dialogs');
 
 export function options(key: string) {

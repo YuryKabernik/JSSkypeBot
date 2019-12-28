@@ -1,4 +1,4 @@
-import { ConversationReference, TurnContext } from 'botbuilder';
+import { ConversationReference, TurnContext } from 'botbuilder-core';
 import * as cron from 'node-cron';
 import { Timezone } from 'tz-offset';
 import { ILogger } from "../../../common/interfaces/ILogger";

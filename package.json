@@ -6,11 +6,12 @@
     "license": "MIT",
     "main": "src/index",
     "scripts": {
-        "start": "node ./index.ts",
-        "watch": "nodemon ./index.ts",
+        "start": "node ./built/index.js",
+        "watch": "nodemon ./built/index.js",
         "lint": "eslint .",
+        "build": "tsc",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "create-web-config": "az bot prepare-deploy --code-dir \".\" --lang Typescript",
+        "create-web-config": "az bot prepare-deploy --code-dir \".\" --lang Javascript",
         "deploy-ready-zip-on-azure": "az webapp deployment source config-zip --resource-group \"Bots\" --name \"WLNTeamSkypeBot\" --src \"code.zip\""
     },
     "repository": {

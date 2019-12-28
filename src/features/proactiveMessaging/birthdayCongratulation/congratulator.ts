@@ -1,4 +1,4 @@
-import { ConversationReference, TurnContext } from 'botbuilder';
+import { ConversationReference, TurnContext } from 'botbuilder-core';
 import * as cron from 'node-cron';
 import { Timezone } from 'tz-offset';
 import * as monthList from '../../../common/months.json';
@@ -7,18 +7,20 @@ import { ReferenceRepository } from '../../../storage/ReferenceRepository.js';
 import { Birthday, ScheduledTask } from '../../models/proactive.js';
 import { cronDateExpression } from '../utils/cronDateExpression';
 import { guid } from '../utils/guid.js';
+import { ILogger } from '../../../common/interfaces/ILogger.js';
 
 export class Сongratulator {
     months: string[];
     birthDates: {[index: string]: Birthday[]};
     scheduledCongradulations: ScheduledTask[];
     conversationReferences: ReferenceRepository;
-    logger: any;
+    logger: ILogger;
     
     constructor(birthDates: {[index: string]: Birthday[]} = {}) {
         this.months = monthList;
         this.birthDates = birthDates;
         this.scheduledCongradulations = [];
+        this.logger = Injection.getInstance('Common.Logger', __filename);
         this.conversationReferences = Injection.getInstance('DAL.ReferenceRepository');
     }
 

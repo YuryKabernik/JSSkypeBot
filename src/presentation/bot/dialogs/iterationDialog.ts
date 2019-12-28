@@ -1,10 +1,10 @@
 // Import some of the capabities from the module.
-import { ComponentDialog, ChoicePrompt, DialogSet, DialogTurnStatus, WaterfallDialog, DialogContext, WaterfallStepContext } from 'botbuilder-dialogs';
+import { StatePropertyAccessor, TurnContext } from 'botbuilder-core';
+import { ChoicePrompt, ComponentDialog, DialogSet, DialogTurnStatus, WaterfallDialog, WaterfallStepContext } from 'botbuilder-dialogs';
+import { AddIterationDialog } from './iterations/add';
+import { EditIterationDialog } from './iterations/edit';
 import { options } from './iterations/options';
 import { RemoveIterationDialog } from './iterations/remove';
-import { EditIterationDialog } from './iterations/edit';
-import { AddIterationDialog } from './iterations/add';
-import { TurnContext, StatePropertyAccessor } from 'botbuilder';
 
 const CHOICE_PRESENTED_OPTION_ITERATION_ACTIVITY = 'CHOICE_PRESENTED_OPTION_ITERATION_ACTIVITY_TYPE';
 

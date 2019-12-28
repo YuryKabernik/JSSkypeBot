@@ -1,7 +1,8 @@
-import { TurnContext, StatePropertyAccessor } from "botbuilder";
+import { TurnContext, StatePropertyAccessor } from "botbuilder-core";
 import { StateManagement } from "../../../configuration/dialogStateManagement";
 import { Injection } from '../../../configuration/registerTypes';
 import { IterationDialog } from "../dialogs/iterationDialog";
+import { Command } from "../models/command";
 
 const MAIN_ITERATION_WATERFALL_DIALOG = 'MAIN_ITERATION_WATERFALL_DIALOG';
 

@@ -3,7 +3,7 @@
  */
 
 import { ConnectionPool } from "mssql";
-import { ConversationReference } from "botbuilder";
+import { ConversationReference } from "botbuilder-core";
 
 export function GetReferenceById(connection: ConnectionPool, id: string) {
     const request = connection.request();

@@ -1,7 +1,10 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "target": "es2016",
+        "target": "es6",
+        "types": [
+            "node"
+        ],
         "noImplicitAny": true,
         "removeComments": true,
         "preserveConstEnums": true,
@@ -11,7 +14,10 @@
         "allowJs": true,
         "strict": true,
         "incremental": true,
-        "tsBuildInfoFile": "./lib/.tsbuildinfo"
+        "tsBuildInfoFile": "./lib/.tsbuildinfo",
+        "typeRoots": [
+            "./node_modules/@types"
+        ]
     },
     "include": [
         "src/**/*"

@@ -1,8 +1,5 @@
-import { WaterfallStepContext } from "botbuilder-dialogs";
-import { IIterationInfo } from "../../../../storage/interfaces/IIteration";
-
-const { options } = require('./options.js');
-const { TextPrompt, ChoicePrompt, ConfirmPrompt, ComponentDialog, DateTimePrompt, WaterfallDialog } = require('botbuilder-dialogs');
+import { ChoicePrompt, ComponentDialog, ConfirmPrompt, DateTimePrompt, TextPrompt, WaterfallDialog } from 'botbuilder-dialogs';
+import { options } from './options.js';
 
 const CHOICE_PRESENTED_OPTION = 'CHOICE_PRESENTED_OPTION_ADD_ITERATION';
 const NUMBER_PROMPT_ITERATION_PATH = 'NUMBER_PROMPT_ITERATION_PATH';
@@ -10,7 +7,7 @@ const INPUT_DATE_AND_TIME = 'INPUT_DATE_AND_TIME';
 const CONFIRM_INPUT_ON_ADD = 'CONFIRM_INPUT_ON_ADD';
 
 export class AddIterationDialog extends ComponentDialog {
-    constructor(ADD_ITERATION_WATERFALL_DIALOG: string, finishCallback?: Function) {
+    constructor(ADD_ITERATION_WATERFALL_DIALOG, finishCallback) {
         super(ADD_ITERATION_WATERFALL_DIALOG);
 
         this.finishCallback = finishCallback;
@@ -38,10 +35,10 @@ export class AddIterationDialog extends ComponentDialog {
      * Prompt the user with the iteration path text value.
      * @param {WaterfallStepContext} stepContext
      */
-    async enterPathStep(stepContext: WaterfallStepContext) {
+    async enterPathStep(stepContext) {
         console.log('AddIterationDialog.enterPathStep');
         stepContext.values['iteration'] = {};
-        const stepOptions = options(NUMBER_PROMPT_ITERATION_PATH, stepContext);
+        const stepOptions = options(NUMBER_PROMPT_ITERATION_PATH);
         return await stepContext.prompt(NUMBER_PROMPT_ITERATION_PATH, stepOptions);
     }
 
@@ -49,10 +46,10 @@ export class AddIterationDialog extends ComponentDialog {
      * Prompt the user with the configured date choice.
      * @param {WaterfallStepContext} stepContext
      */
-    async choiceDateStep(stepContext: WaterfallStepContext) {
+    async choiceDateStep(stepContext) {
         console.log('AddIterationDialog.choiceDateStep');
         stepContext.values['iteration'].path = stepContext.result || '';
-        const stepOptions = options(CHOICE_PRESENTED_OPTION, stepContext);
+        const stepOptions = options(CHOICE_PRESENTED_OPTION);
         return await stepContext.prompt(CHOICE_PRESENTED_OPTION, stepOptions);
     }
 
@@ -61,7 +58,7 @@ export class AddIterationDialog extends ComponentDialog {
      * or process with user input date.
      * @param {WaterfallStepContext} stepContext
      */
-    async branchingChoiceStep(stepContext: WaterfallStepContext) {
+    async branchingChoiceStep(stepContext) {
         console.log('AddIterationDialog.branchingChoiceStep');
         const selectedDate = new Date();
         selectedDate.setHours(9, 0, 0);
@@ -73,7 +70,7 @@ export class AddIterationDialog extends ComponentDialog {
             selectedDate.setDate(selectedDate.getDate() + 1);
             break;
         case 'input':
-            const stepOptions = options(INPUT_DATE_AND_TIME, stepContext);
+            const stepOptions = options(INPUT_DATE_AND_TIME);
             return await stepContext.prompt(INPUT_DATE_AND_TIME, stepOptions);
         default:
             return await stepContext.replaceDialog(this.id);
@@ -90,13 +87,13 @@ export class AddIterationDialog extends ComponentDialog {
      * Collect user input about entered date.
      * @param {WaterfallStepContext} stepContext
      */
-    async collectSelectedDateStep(stepContext: WaterfallStepContext) {
+    async collectSelectedDateStep(stepContext) {
         console.log('AddIterationDialog.collectSelectedDateStep');
-        const iteration = stepContext.values['iteration'] as IIterationInfo;
+        const iteration = stepContext.values['iteration'];
         if (stepContext.result && stepContext.result[0]) {
             iteration.date = new Date(stepContext.result[0].value);
         }
-        const stepOptions = options(CONFIRM_INPUT_ON_ADD, stepContext);
+        const stepOptions = options(CONFIRM_INPUT_ON_ADD);
         return await stepContext.prompt(CONFIRM_INPUT_ON_ADD, stepOptions);
     }
 
@@ -104,21 +101,19 @@ export class AddIterationDialog extends ComponentDialog {
      * Confirm new iteration input.
      * @param {WaterfallStepContext} stepContext
      */
-    async confirmInputStep(stepContext: WaterfallStepContext) {
+    async confirmInputStep(stepContext) {
         console.log('AddIterationDialog.confirmInputStep');
         let iteration = null;
         switch (stepContext.result) {
         case true:
-            iteration = stepContext.values['iteration'] as IIterationInfo;
+            iteration = stepContext.values['iteration'];
             await stepContext.context.sendActivity(
                 `Iteration notification will be Added. Date: ${ iteration.date } Path: ${ iteration.path }.`
             );
             break;
         case false:
-            return await stepContext.endDialog();
         default:
-            await stepContext.context.sendActivity('Is that mean Yes?');
-            return await this.repromptDialog();
+            return await stepContext.endDialog();
         }
 
         if (typeof (this.finishCallback) === 'function') {

@@ -1,4 +1,4 @@
-import { ActivityHandler, TurnContext } from 'botbuilder';
+import { ActivityHandler, TurnContext } from 'botbuilder-core';
 import { Injection } from '../../configuration/registerTypes';
 import { IllnessAnswering } from '../../features/messageAnswering/illnessAnswering';
 import { birthdayDates } from '../../features/proactiveMessaging/birthdayCongratulation/birthdayDates';

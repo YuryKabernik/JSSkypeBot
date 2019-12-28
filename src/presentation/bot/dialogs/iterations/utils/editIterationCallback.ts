@@ -1,7 +1,7 @@
 import { WaterfallStepContext } from "botbuilder-dialogs";
 import { IterationModified } from '../values/iterationModified'
 
-export const editIterationCallback: {} = {
+export const editIterationCallback: {[i: string]: any} = {
     date: async function (stepContext: WaterfallStepContext) {
         const iteration = (stepContext.values as IterationModified);
         const previousDate = iteration.date;

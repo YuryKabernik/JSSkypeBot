@@ -1,4 +1,5 @@
-import { BotFrameworkAdapter, TurnContext } from "botbuilder";
+import { BotFrameworkAdapter } from "botbuilder";
+import { TurnContext } from "botbuilder-core";
 import { Request, Response } from "restify";
 import { Injection } from "../../../configuration/registerTypes";
 import { ReferenceRepository } from "../../../storage/ReferenceRepository";

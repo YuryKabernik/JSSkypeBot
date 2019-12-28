@@ -3,7 +3,7 @@
  */
 
 import { INotification } from "../interfaces/INotification";
-import { ConnectionPool, NVarChar, Bit } from "mssql";
+import { ConnectionPool, NVarChar, Bit } from 'mssql';
 
 export function GetNotificationById(connection: ConnectionPool, id: string) {
     return {

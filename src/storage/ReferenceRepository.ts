@@ -1,4 +1,4 @@
-import { ConversationReference } from 'botbuilder';
+import { ConversationReference } from 'botbuilder-core';
 import { ILogger } from '../common/interfaces/ILogger';
 import { Injection } from '../configuration/registerTypes';
 import { IDbClient } from '../services/interfaces/IDbClient';
