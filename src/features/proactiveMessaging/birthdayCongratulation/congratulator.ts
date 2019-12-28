@@ -3,11 +3,11 @@ import * as cron from 'node-cron';
 import { Timezone } from 'tz-offset';
 import * as monthList from '../../../common/months.json';
 import { Injection } from '../../../configuration/registerTypes';
-import { ReferenceRepository } from '../../../storage/ReferenceRepository.js';
-import { Birthday, ScheduledTask } from '../../models/proactive.js';
+import { ReferenceRepository } from '../../../storage/ReferenceRepository';
+import { Birthday, ScheduledTask } from '../../models/proactive';
 import { cronDateExpression } from '../utils/cronDateExpression';
-import { guid } from '../utils/guid.js';
-import { ILogger } from '../../../common/interfaces/ILogger.js';
+import { guid } from '../utils/guid';
+import { ILogger } from '../../../common/interfaces/ILogger';
 
 export class Сongratulator {
     months: string[];

@@ -1,6 +1,6 @@
 import {Injection} from '../../configuration/registerTypes';
 import * as keyPhrases from './keyPhrases/gotSickToday.json';
-import answers from './textAnswers/answers.js';
+import answers from './textAnswers/answers';
 import { AnswersFormatter } from '../answersFormatter';
 
 export class IllnessAnswering {

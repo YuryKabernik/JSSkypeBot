@@ -1,5 +1,5 @@
 import { ConnectionPool } from 'mssql';
-import { Injection } from '../configuration/registerTypes.js';
+import { Injection } from '../configuration/registerTypes';
 
 export function dbConnection(): ConnectionPool {
     const logger = Injection.getInstance('Common.Logger', __filename);

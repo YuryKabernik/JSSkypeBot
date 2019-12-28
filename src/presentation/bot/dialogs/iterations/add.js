@@ -1,5 +1,5 @@
 import { ChoicePrompt, ComponentDialog, ConfirmPrompt, DateTimePrompt, TextPrompt, WaterfallDialog } from 'botbuilder-dialogs';
-import { options } from './options.js';
+import { options } from './options';
 
 const CHOICE_PRESENTED_OPTION = 'CHOICE_PRESENTED_OPTION_ADD_ITERATION';
 const NUMBER_PROMPT_ITERATION_PATH = 'NUMBER_PROMPT_ITERATION_PATH';

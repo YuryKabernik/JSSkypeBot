@@ -9,7 +9,7 @@
         "removeComments": true,
         "preserveConstEnums": true,
         "resolveJsonModule": true,
-        "outDir": "./built",
+        "outDir": "./lib",
         "rootDir": "./src",
         "allowJs": true,
         "strict": true,

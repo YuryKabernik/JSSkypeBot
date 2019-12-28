@@ -1,7 +1,7 @@
 import { ChoicePrompt, ComponentDialog, ConfirmPrompt, DateTimePrompt, NumberPrompt, WaterfallDialog } from 'botbuilder-dialogs';
-import { Injection } from '../../../../configuration/registerTypes.js';
-import { options } from './options.js';
-import { editIterationCallback } from './utils/editIterationCallback.js';
+import { Injection } from '../../../../configuration/registerTypes';
+import { options } from './options';
+import { editIterationCallback } from './utils/editIterationCallback';
 
 const CHOICE_PRESENTED_OPTION_WHAT_ITERATION_TO_EDIT = 'CHOICE_PRESENTED_OPTION_WHAT_ITERATION_TO_EDIT';
 const CHOICE_PRESENTED_OPTION_WHAT_PROPERTY_TO_EDIT = 'CHOICE_PRESENTED_OPTION_WHAT_PROPERTY_TO_EDIT';

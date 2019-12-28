@@ -1,8 +1,8 @@
 import { BotFrameworkAdapter } from 'botbuilder';
-import { ILogger } from '../../../common/interfaces/ILogger.js';
-import { Injection } from '../../../configuration/registerTypes.js';
+import { ILogger } from '../../../common/interfaces/ILogger';
+import { Injection } from '../../../configuration/registerTypes';
 import { Request, Response } from 'restify';
-import { SkypeBot } from '../../bot/bot.js';
+import { SkypeBot } from '../../bot/bot';
 
 /**
  * Notification REST controller

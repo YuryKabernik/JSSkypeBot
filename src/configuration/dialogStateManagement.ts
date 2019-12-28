@@ -1,5 +1,5 @@
 import { ConversationState, UserState, StatePropertyAccessor, TurnContext } from "botbuilder";
-import { Injection } from '../configuration/registerTypes.js';
+import { Injection } from '../configuration/registerTypes';
 
 // The accessor names for the conversation data and user profile state property accessors.
 const DIALOG_STATE = 'dialogState';
