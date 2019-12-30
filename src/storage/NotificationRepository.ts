@@ -2,10 +2,11 @@ import { INotification } from "./interfaces/INotification";
 import { Injection } from "../configuration/registerTypes";
 import { ILogger } from "../common/interfaces/ILogger";
 import * as Notifiactions from "./Queries/notifications";
+import { DbClient } from "../services/dbClient";
 
 export class NotificationRepository {
     private _logger: ILogger;
-    _dbClient: any;
+    _dbClient: DbClient;
 
     constructor() {
         this._logger = Injection.getInstance('Common.Logger', 'ReferenceRepository');
@@ -49,19 +50,20 @@ export class NotificationRepository {
      * Saves notification by provided id.
      * @param {Object} notification Notification data that need to be stored.
      * @param {String} notification.id Notification id.
-     * @param {Object} notification.data Notification data to store.
-     * @param {Object} notification.data.executionDate DateTime of when this notification should be executed.
-     * @param {Object} [notification.data.userMessage] Message that should be displayed to the user.
-     * @param {Object} [notification.data.creationDate] DateTime of notification creation.
+     * @param {Object} notification.executionDate DateTime of when this notification should be executed.
+     * @param {Object} notification.message Message that should be displayed to the user.
+     * @param {Object} [notification.creationDate] DateTime of notification creation.
      */
-    async save(notificationData: INotification): Promise<Boolean> {
+    async save(notification: INotification): Promise<Boolean> {
         let result = null;
         try {
             result = await this._dbClient.request(
                 Notifiactions.SaveNotification,
                 {
-                    id: notificationData.id,
-                    content: notificationData.content
+                    id: notification.id,
+                    date: notification.date,
+                    message: notification.message,
+                    creationDate: notification.creationDate
                 }
             );
         } catch (error) {

@@ -1,9 +1,9 @@
-import { ActivityHandler, TurnContext } from 'botbuilder-core';
+import { ActivityHandler, TurnContext } from 'botbuilder';
 import { Injection } from '../../configuration/registerTypes';
 import { IllnessAnswering } from '../../features/messageAnswering/illnessAnswering';
 import { birthdayDates } from '../../features/proactiveMessaging/birthdayCongratulation/birthdayDates';
 import { Сongratulator } from '../../features/proactiveMessaging/birthdayCongratulation/congratulator';
-import * as holidays from '../../features/proactiveMessaging/holidayReminder/holidays';
+import holidays from '../../features/proactiveMessaging/holidayReminder/holidays';
 import { HolidaySheduler } from '../../features/proactiveMessaging/holidayReminder/holidayScheduler';
 import { NewIteration } from '../../features/proactiveMessaging/iterationUpdate/newIteration';
 import { WeeklyReminder } from '../../features/proactiveMessaging/weeklyReminder/weeklyReminder';
@@ -39,7 +39,7 @@ export class SkypeBot extends ActivityHandler {
     }
 
     _assignOnMessageAction() {
-        this.onMessage(async (context: TurnContext, next) => {
+        this.onMessage(async (context: TurnContext, next: () => any) => {
             if (!context.activity.conversation.isGroup) {
                 const commands = context.turnState.get('commands');
                 if (commands && commands.length) {

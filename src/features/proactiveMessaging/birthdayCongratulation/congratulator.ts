@@ -11,12 +11,12 @@ import { ILogger } from '../../../common/interfaces/ILogger';
 
 export class Сongratulator {
     months: string[];
-    birthDates: {[index: string]: Birthday[]};
+    birthDates: { [index: string]: Birthday[] };
     scheduledCongradulations: ScheduledTask[];
     conversationReferences: ReferenceRepository;
     logger: ILogger;
-    
-    constructor(birthDates: {[index: string]: Birthday[]} = {}) {
+
+    constructor(birthDates: { [index: string]: Birthday[] } = {}) {
         this.months = monthList;
         this.birthDates = birthDates;
         this.scheduledCongradulations = [];
@@ -37,7 +37,15 @@ export class Сongratulator {
                 this.birthDates[conversationReference.conversation.name];
 
             if (congradulatinGroupExists) {
-                this.scheduleBirthdayCongraduloations(conversationReference, sendEventCallback);
+                try {
+                    this.scheduleBirthdayCongraduloations(conversationReference, sendEventCallback);
+                } catch (error) {
+                    this.logger.logError(
+                        `Scheduling birthday Congradulation for conversation {${conversationReference.conversation.id}} failed!
+                        \nMessage: ${ error.message} 
+                        \nStack: ${ error.stack}`
+                    );
+                }
             }
         });
     }
@@ -50,14 +58,14 @@ export class Сongratulator {
             const scheduleOptions: cron.ScheduleOptions = {
                 timezone: process.env.Timezone as Timezone
             };
-            
+
             const scheduledCongradulation = cron.schedule(dateExpression, () => {
                 sendEventCallback(conversationReference, async (turnContext: TurnContext) => {
                     try {
-                        await turnContext.sendActivity(`С днём рождения, <at>${ birthday.name }</at>!`);
+                        await turnContext.sendActivity(`С днём рождения, <at>${birthday.name}</at>!`);
                     } catch (error) {
                         this.logger.logError(
-                            `Birthday Notification for ${ birthday.name } executions failed! Message: ${ error.message } Stack: ${ error.stack }`
+                            `Birthday Notification for ${birthday.name} executions failed! Message: ${error.message} Stack: ${error.stack}`
                         );
                     }
                 });

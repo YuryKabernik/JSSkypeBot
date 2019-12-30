@@ -33,7 +33,7 @@ export async function reactOnCommand(command: Command, turnContext: TurnContext,
 
 export async function continueBotDialog(turnContext: TurnContext, botState: StateManagement) {
     const dialogData = await botState.flowData.get(turnContext)
-    if (dialogData.lastDialog) {
+    if (dialogData && dialogData.lastDialog) {
         await dialogData.lastDialog.run(
             turnContext, botState.flowData
         );

@@ -31,7 +31,15 @@ export class HolidaySheduler {
             return;
         }
         conversationReferences.forEach((conversationReference: ConversationReference) => {
-            this.scheduleHolidaysCongraduloations(conversationReference, sendEventCallback);
+            try {
+                this.scheduleHolidaysCongraduloations(conversationReference, sendEventCallback);
+            } catch (error) {
+                this.logger.logError(
+                    `Scheduling holiday Notification for conversation {${conversationReference.conversation.id}} failed!
+                    \nMessage: ${ error.message} 
+                    \nStack: ${ error.stack}`
+                );
+            }
         });
     }
 
@@ -50,7 +58,7 @@ export class HolidaySheduler {
                         await turnContext.sendActivity(holiday.selebration);
                     } catch (error) {
                         this.logger.logError(
-                            `Holiday Notification executions failed! Message: ${ error.message } Stack: ${ error.stack }`
+                            `Holiday Notification executions failed! Message: ${error.message} Stack: ${error.stack}`
                         );
                     }
                 });

@@ -1,18 +1,16 @@
 import * as fs from 'fs';
-import { parse } from 'dot-properties';
+import * as PropertiesReader from 'properties-reader';
 
-const answers = {};
+const answers: { [index: string]: any } = {};
 
 (function concatProperties() {
     if (!answers.length) {
         const pathsToPropertyFiles = fs.readdirSync(__dirname)
             .filter(file => file.endsWith('.properties'))
-            .map(fileName => `${ __dirname }/${ fileName }`);
+            .map(fileName => `${__dirname}/${fileName}`);
         pathsToPropertyFiles.forEach(path => {
-            const src = fs.readFileSync(path, {
-                encoding: 'utf8'
-            });
-            Object.assign(answers, parse(src));
+            const pr = PropertiesReader(path)
+            Object.assign(answers, pr.getAllProperties());
         });
     }
 })();

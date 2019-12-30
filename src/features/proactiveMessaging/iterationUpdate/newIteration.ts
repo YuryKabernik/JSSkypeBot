@@ -48,7 +48,15 @@ export class NewIteration {
         }
         for (let index = 0; index < conversationReferences.length; index++) {
             const reference = conversationReferences[index];
-            await this.scheduleNewIterationsNotification(reference, sendEventCallback);
+            try {
+                await this.scheduleNewIterationsNotification(reference, sendEventCallback);
+            } catch (error) {
+                this.logger.logError(
+                    `Scheduling birthday Congradulation for conversation {${reference.conversation.id}} failed!
+                    \nMessage: ${ error.message} 
+                    \nStack: ${ error.stack}`
+                );
+            }
         }
     }
 
