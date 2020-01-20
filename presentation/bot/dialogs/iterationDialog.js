@@ -12,9 +12,10 @@ const EDIT_ITERATION_WATERFALL_DIALOG = 'EDIT_ITERATION_WATERFALL_DIALOG';
 const ADD_ITERATION_WATERFALL_DIALOG = 'ADD_ITERATION_WATERFALL_DIALOG';
 
 class IterationDialog extends ComponentDialog {
-    constructor(MAIN_ITERATION_WATERFALL_DIALOG, finishCallback) {
+    constructor(MAIN_ITERATION_WATERFALL_DIALOG, botState, finishCallback) {
         super(MAIN_ITERATION_WATERFALL_DIALOG);
 
+        this.botState = botState;
         this.finishCallback = finishCallback;
 
         // Define the main dialog and its related components.
@@ -88,6 +89,9 @@ class IterationDialog extends ComponentDialog {
         await stepContext.context.sendActivity(
             `Let me know when you'll decide to schedule, delete or update any iteration info.`
         );
+        if (typeof (this.finishCallback) === 'function') {
+            await this.finishCallback(stepContext.result, this.botState);
+        }
         return await stepContext.endDialog();
     }
 
@@ -108,17 +112,17 @@ class IterationDialog extends ComponentDialog {
                 await stepContext.context.sendActivity(
                     `Sorry, something went wrong :( Please сontact Yuri Kabernik-Berazouski to help you solve this problem.`
                 );
-                return await stepContext.endDialog();
-            }
-
-            if (typeof (this.finishCallback) === 'function') {
-                await this.finishCallback(stepContext.result);
+                break;
             }
         }
         await stepContext.context.sendActivity(
             `The dialogue is over, thanks for participating :)
             Let me know when you'll decide to schedule, delete or update any iteration info.`
         );
+
+        if (typeof (this.finishCallback) === 'function') {
+            await this.finishCallback(stepContext.result, this.botState);
+        }
         return await stepContext.endDialog();
     }
 }

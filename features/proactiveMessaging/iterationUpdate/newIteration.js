@@ -26,7 +26,7 @@ class NewIteration {
     }
 
     async schedule(sendEventCallback) {
-        const conversationReferences = await this.conversationReferences.all();
+        const conversationReferences = await this.conversationReferences.all() || [];
         for (let index = 0; index < conversationReferences.length; index++) {
             const reference = conversationReferences[index];
             await this.scheduleNewIterationsNotification(reference, sendEventCallback);
@@ -47,14 +47,14 @@ class NewIteration {
                             `Iteration Notification executions failed! Message: ${ error.message } Stack: ${ error.stack }`
                         );
                     } finally {
-                        this._removeSheduledCongradulation(iteration.id, scheduledCongradulation);
-                        await this.iterations.remove(iteration.id);
+                        // this._removeSheduledCongradulation(iteration.id, scheduledCongradulation);
+                        // await this.iterations.remove(iteration.id);
                     }
                 });
             }, { timezone: process.env.Timezone });
 
-            const scheduledEventExists = this.scheduledIterationNotifications.findIndex(task => task.taskId === iteration.id);
-            if (scheduledEventExists !== -1) {
+            const scheduledEventExists = this.scheduledIterationNotifications.filter(task => task.taskId === iteration.id)[0];
+            if (scheduledEventExists) {
                 this.logger.logInfo(`Sheduled iteration event already exists: CRON-DATE-TIME:[${ dateExpression }]`);
                 scheduledCongradulation.destroy();
             } else {
