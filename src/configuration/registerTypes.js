@@ -13,8 +13,8 @@ const { IterationRepository } = require('../storage/IterationRepository.js');
 const { NotificationRepository } = require('../storage/NotificationRepository.js');
 const { StateManagement } = require('./dialogStateManagement.js');
 const { DbClient } = require('../services/dbClient.js');
-const { dbConnection } = require('../configuration/dbConnection.js');
-const { botAdapter } = require('../configuration/botAdapter.js');
+const { dbConnection } = require('./dbConnection.js');
+const { botAdapter } = require('./botAdapter.js');
 const { MemoryStorage } = require('botbuilder');
 
 let injector = null;
