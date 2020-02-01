@@ -1,4 +1,4 @@
-const { ListStyle } = require('botbuilder-dialogs');
+import { ListStyle } from 'botbuilder-dialogs';
 
 export function options(key: string) {
     const options: any = {
