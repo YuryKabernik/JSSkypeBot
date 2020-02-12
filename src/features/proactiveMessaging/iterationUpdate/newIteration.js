@@ -38,19 +38,20 @@ class NewIteration {
         avaliableIterations.forEach(iteration => {
             const dateExpression = cronDateExpression(iteration);
             const scheduledCongradulation = cron.schedule(dateExpression, () => {
-                sendEventCallback(conversationReference, async (turnContext) => {
-                    try {
+                sendEventCallback(conversationReference, (turnContext) =>
+                    new Promise(resolve => {
                         const message = this.answersFormatter.format('transferItemsToIteration', { name: iteration.path });
-                        await turnContext.sendActivity(message);
-                    } catch (error) {
+                        turnContext.sendActivity(message);
+                        resolve(message);
+                    }).catch(error =>
                         this.logger.logError(
                             `Iteration Notification executions failed! Message: ${ error.message } Stack: ${ error.stack }`
-                        );
-                    } finally {
+                        )
+                    ).finally(() => {
                         // this._removeSheduledCongradulation(iteration.id, scheduledCongradulation);
                         // await this.iterations.remove(iteration.id);
-                    }
-                });
+                    })
+                );
             }, { timezone: process.env.Timezone });
 
             const scheduledEventExists = this.scheduledIterationNotifications.filter(task => task.taskId === iteration.id)[0];

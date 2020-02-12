@@ -24,16 +24,15 @@ class HolidaySheduler {
             const dateExpression = cronDateExpression(holidayDate);
             const taskId = guid(dateExpression + conversationReference.conversation.id);
             const scheduledCongradulation = cron.schedule(dateExpression, () => {
-                sendEventCallback(conversationReference, async (turnContext) => {
-                    try {
-                        await turnContext.sendActivity(holidayDate.name);
-                        await turnContext.sendActivity(holidayDate.selebration);
-                    } catch (error) {
-                        this.logger.logError(
-                            `Holiday Notification executions failed! Message: ${ error.message } Stack: ${ error.stack }`
-                        );
-                    }
-                });
+                sendEventCallback(conversationReference, async (turnContext) =>
+                    new Promise(resolve => {
+                        turnContext.sendActivity(holidayDate.name);
+                        turnContext.sendActivity(holidayDate.selebration);
+                        resolve();
+                    }).catch(error => this.logger.logError(
+                        `Holiday Notification executions failed! Message: ${ error.message } Stack: ${ error.stack }`
+                    ))
+                );
             }, { timezone: process.env.Timezone });
 
             const scheduledEventExists = this.scheduledCongradulations.filter(sc => sc.taskId === taskId)[0];

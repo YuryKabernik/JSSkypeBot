@@ -39,14 +39,15 @@ class WeeklyReminder {
         notifications.forEach(notificationData => {
             const dateExpression = cronWeekExpression(notificationData.date);
             const scheduledNotification = cron.schedule(dateExpression, () => {
-                sendEventCallback(reference, async (turnContext) => {
-                    try {
+                sendEventCallback(reference, (turnContext) =>
+                    new Promise((resolve, reject) => {
                         const message = this.answersFormatter.lookup('fillYourMyTimeJournal');
-                        await turnContext.sendActivity(notificationData.message.trim() ? notificationData.message : message);
-                    } catch (error) {
+                        turnContext.sendActivity(notificationData.message.trim() ? notificationData.message : message);
+                        resolve(message);
+                    }).catch((error) => {
                         this.logger.logError(`Weekly Notification executions failed! Message: ${ error.message } Stack: ${ error.stack }`);
-                    }
-                });
+                    })
+                );
             }, { timezone: process.env.Timezone });
 
             const scheduledEventExists = this.scheduledWeeklyNotifications.includes(notificationData.id);

@@ -15,6 +15,9 @@ module.exports.botAdapter = function () {
     });
 
     // Catch-all for errors.
+    // + https://nodejs.org/api/process.html
+    // + https://nodejs.org/api/process.html#process_warning_using_uncaughtexception_correctly
+    // + https://nodejs.org/api/process.html#process_event_unhandledrejection
     adapter.onTurnError = async (context, error) => {
         console.error(`\n [onTurnError]: ${ error }`);
         console.error(`\n [onTurnError]: ${ error.stack }`);

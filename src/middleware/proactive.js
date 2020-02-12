@@ -7,6 +7,10 @@ const { MicrosoftAppCredentials } = require('botframework-connector');
  * Restores service trust to the conversation activity.
  */
 module.exports.trustServiceUrl = async (context, next) => {
-    MicrosoftAppCredentials.trustServiceUrl(context.activity.serviceUrl);
+    const serviceUrl = context.activity.serviceUrl;
+    const isUntrusted = !MicrosoftAppCredentials.isTrustedServiceUrl(serviceUrl);
+    if (isUntrusted) {
+        MicrosoftAppCredentials.trustServiceUrl(serviceUrl);
+    }
     await next();
 };
