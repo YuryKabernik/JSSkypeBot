@@ -1,5 +1,6 @@
 const { Container } = require('../common/injector.js');
 const { Logger } = require('../common/logger.js');
+const { FileLogger } = require('../common/fileLogger.js');
 const { SkypeBot } = require('../presentation/bot/bot.js');
 const { IllnessAnswering } = require('../features/messageAnswering/illnessAnswering.js');
 const { Сongratulator } = require('../features/proactiveMessaging/birthdayCongratulation/congratulator.js');
@@ -23,7 +24,11 @@ function registerTypes() {
     if (!injector) {
         injector = new Container();
 
-        injector.register('Common.Logger', (...args) => new Logger(...args));
+        injector.register('Common.Logger', (...args) => {
+            return (process.env.loggerFilePath) ?
+                new FileLogger(process.env.loggerFilePath, ...args) :
+                new Logger(...args);
+        });
         injector.register('Common.AnswersFormatter', (...args) => new AnswersFormatter(...args));
 
         injector.register('Services.DbClient', new DbClient(dbConnection()));
