@@ -4,5 +4,5 @@
 const uuid = require('uuid/v5');
 
 module.exports.guid = function (key) {
-    return uuid(key, process.env.MicrosoftAppId);
+    return uuid(key, process.env.MICROSOFT_APP_ID);
 };

@@ -15,9 +15,9 @@ class FileLogger extends Logger {
             const fullMessage = `${ prefix } --- ${ dateStamp } ${ timeStamp } --- ${ message } \n`;
             fs.appendFileSync(this.path, fullMessage);
             resolve();
-        }).then(() =>
+        }).finally(() =>
             super.writeLog(prefix, message)
-        );
+        ).catch(reason => console.error(reason));
     }
 }
 

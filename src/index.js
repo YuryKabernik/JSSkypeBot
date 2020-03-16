@@ -4,7 +4,7 @@ const restify = require('restify');
 const { start } = require('./startup/startupApplication.js');
 
 // Import required bot configuration.
-const ENV_FILE = path.join(__dirname, '.env');
+const ENV_FILE = path.join(__dirname, process.env.botConfig || 'local.env');
 dotenv.config({ path: ENV_FILE });
 
 // Create HTTP server
