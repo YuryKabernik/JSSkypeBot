@@ -40,7 +40,7 @@ class WeeklyReminder {
             const dateExpression = cronWeekExpression(notificationData.date);
             const scheduledNotification = cron.schedule(dateExpression, () => {
                 sendEventCallback(reference, (turnContext) =>
-                    new Promise((resolve, reject) => {
+                    new Promise((resolve) => {
                         const message = this.answersFormatter.lookup('fillYourMyTimeJournal');
                         turnContext.sendActivity(notificationData.message.trim() ? notificationData.message : message);
                         resolve(message);

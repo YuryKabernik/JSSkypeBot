@@ -16,12 +16,12 @@ class NewIteration {
     async addIterations(iterations = []) {
         for (let index = 0; index < iterations.length; index++) {
             const iteration = iterations[index];
-            const id = guid(`${ iteration.path } ${ iteration.date }`);
+            const id = guid(`${iteration.path} ${iteration.date}`);
             await this.iterations.save({
                 id: id,
                 data: iteration
             });
-            this.logger.logInfo(`New iteration saved ${ iteration.path }`);
+            this.logger.logInfo(`New iteration saved ${iteration.path}`);
         }
     }
 
@@ -43,29 +43,26 @@ class NewIteration {
                         const message = this.answersFormatter.format('transferItemsToIteration', { name: iteration.path });
                         turnContext.sendActivity(message);
                         resolve(message);
-                    }).catch(error =>
-                        this.logger.logError(
-                            `Iteration Notification executions failed! Message: ${ error.message } Stack: ${ error.stack }`
-                        )
-                    ).finally(() => {
-                        // this._removeSheduledCongradulation(iteration.id, scheduledCongradulation);
-                        // await this.iterations.remove(iteration.id);
-                    })
+                    }).then(() =>
+                        this._removeSheduledIterationNotification(iteration.id, scheduledCongradulation)
+                    ).catch(error => this.logger.logError(
+                        `Iteration Notification executions failed! Message: ${error.message} Stack: ${error.stack}`
+                    ))
                 );
             }, { timezone: process.env.Timezone });
 
             const scheduledEventExists = this.scheduledIterationNotifications.filter(task => task.taskId === iteration.id)[0];
             if (scheduledEventExists) {
-                this.logger.logInfo(`Sheduled iteration event already exists: CRON-DATE-TIME:[${ dateExpression }]`);
+                this.logger.logInfo(`Sheduled iteration event already exists: CRON-DATE-TIME:[${dateExpression}]`);
                 scheduledCongradulation.destroy();
             } else {
-                this.logger.logInfo(`New iteration event scheduled: CRON-DATE-TIME:[${ dateExpression }]`);
+                this.logger.logInfo(`New iteration event scheduled: CRON-DATE-TIME:[${dateExpression}]`);
                 this.scheduledIterationNotifications.push({ taskId: iteration.id, scheduledCongradulation });
             }
         });
     }
 
-    _removeSheduledCongradulation(taskId, scheduledCongradulation) {
+    _removeSheduledIterationNotification(taskId, scheduledCongradulation) {
         scheduledCongradulation.destroy();
         const indexOfConfiguration = this.scheduledIterationNotifications.findIndex(notification => notification.taskId === taskId);
         if (indexOfConfiguration !== -1) {

@@ -7,7 +7,7 @@ class FileLogger extends Logger {
         this.path = path;
     }
 
-    writeLog(prefix, message) {
+    _writeLog(prefix, message) {
         return new Promise(resolve => {
             const dateTimeNow = new Date();
             const timeStamp = dateTimeNow.toLocaleTimeString();
@@ -16,8 +16,8 @@ class FileLogger extends Logger {
             fs.appendFileSync(this.path, fullMessage);
             resolve();
         }).finally(() =>
-            super.writeLog(prefix, message)
-        ).catch(reason => console.error(reason));
+            super._writeLog(prefix, message)
+        );
     }
 }
 
