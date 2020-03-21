@@ -2,24 +2,25 @@
     "name": "do-not-deny-yourself-anything",
     "version": "1.0.0",
     "description": "ask people do not deny yourself anything",
-    "author": "Generated using Microsoft Bot Builder Yeoman generator v4.5.0",
+    "author": "Yury Kabernik-Berazouski 2019-2020",
     "license": "MIT",
     "main": "index.js",
     "scripts": {
-        "start": "node ./index.js",
-        "watch": "nodemon ./index.js",
+        "start": "node ./src/index.js",
+        "watch": "nodemon ./src/index.js",
         "lint": "eslint .",
         "test": "echo \"Error: no test specified\" && exit 1",
         "create-web-config": "az bot prepare-deploy --code-dir \".\\src\" --lang Javascript",
-        "deploy-ready-zip-on-azure": "az webapp deployment source config-zip --resource-group \"Bots\" --name \"WLNTeamSkypeBot\" --src \"code.zip\""
+        "deploy-ready-zip-on-azure": "az webapp deployment source config-zip --resource-group \"WLNTeamBot\" --name \"wlnteambot\" --src \"code.zip\""
     },
     "repository": {
         "type": "git",
         "url": "https://github.com/KobernykYura/JSSkypeBot"
     },
     "dependencies": {
-        "botbuilder": "^4.7.1",
-        "botbuilder-dialogs": "^4.7.1",
+        "botbuilder": "^4.7.2",
+        "botbuilder-core": "^4.7.2",
+        "botbuilder-dialogs": "^4.7.2",
         "dot-properties": "^0.3.2",
         "dotenv": "^8.0.0",
         "mssql": "^5.1.0",
