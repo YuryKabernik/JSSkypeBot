@@ -2,3 +2,5 @@ node_modules
 lib
 .env
 code.zip
+src/local.env
+src/server.env
