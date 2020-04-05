@@ -1,4 +1,4 @@
-const { TurnContext } = require('botbuilder');
+const { TurnContext } = require('botbuilder-core');
 const Injector = require('../../../configuration/registerTypes.js');
 
 class Messaging {

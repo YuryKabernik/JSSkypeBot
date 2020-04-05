@@ -14,7 +14,7 @@ class HolidaySheduler {
     async schedule(sendEventCallback) {
         const conversationReferences = await this.conversationReferences.all();
         conversationReferences.forEach(reference => {
-            this._logger.logInfo(`Scheduling holidays congradulations to the conversation: ${ reference.conversation.id }`);
+            this._logger.logInfo(`Scheduling holidays congradulations to the conversation: ${reference.conversation.id}`);
             this.scheduleHolidaysCongraduloations(reference, sendEventCallback);
         });
     }
@@ -24,24 +24,23 @@ class HolidaySheduler {
             const dateExpression = cronDateExpression(holidayDate);
             const taskId = guid(dateExpression + conversationReference.conversation.id);
             const scheduledCongradulation = cron.schedule(dateExpression, () => {
-                sendEventCallback(conversationReference, async (turnContext) => {
-                    try {
-                        await turnContext.sendActivity(holidayDate.name);
-                        await turnContext.sendActivity(holidayDate.selebration);
-                    } catch (error) {
-                        this.logger.logError(
-                            `Holiday Notification executions failed! Message: ${ error.message } Stack: ${ error.stack }`
-                        );
-                    }
-                });
+                sendEventCallback(conversationReference, async (turnContext) =>
+                    new Promise(resolve => {
+                        turnContext.sendActivity(holidayDate.name);
+                        turnContext.sendActivity(holidayDate.selebration);
+                        resolve();
+                    }).catch(error => this.logger.logError(
+                        `Holiday Notification executions failed! \nMessage: ${error.message} \nStack: ${error.stack}`
+                    ))
+                );
             }, { timezone: process.env.Timezone });
 
             const scheduledEventExists = this.scheduledCongradulations.filter(sc => sc.taskId === taskId)[0];
             if (scheduledEventExists) {
-                this._logger.logInfo(`Holiday notification destroyed - taskId: ${ taskId }`);
+                this._logger.logInfo(`Holiday notification destroyed - taskId: ${taskId}`);
                 scheduledCongradulation.destroy();
             } else {
-                this._logger.logInfo(`Holiday notification scheduled - taskId: ${ taskId }`);
+                this._logger.logInfo(`Holiday notification scheduled - taskId: ${taskId}`);
                 this.scheduledCongradulations.push({ scheduledCongradulation, taskId });
             }
         });

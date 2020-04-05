@@ -1,5 +1,5 @@
 const sql = require('mssql');
-const Injection = require('../configuration/registerTypes.js');
+const Injection = require('./registerTypes.js');
 
 module.exports.dbConnection = function dbConnection() {
     const logger = Injection.getInstance('Common.Logger', __filename);
