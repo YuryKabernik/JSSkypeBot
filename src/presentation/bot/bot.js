@@ -24,12 +24,10 @@ class SkypeBot extends ActivityHandler {
 
     _assignOnMessageAction() {
         this.onMessage(async (context, next) => {
-            if (!context.activity.conversation.isGroup) {
-                if (context.commands && context.commands.length) {
-                    await this.executeCommands(context, context.commands);
-                } else {
-                    await this.continueDialog(context);
-                }
+            if (context.commands && context.commands.length) {
+                await this.executeCommands(context, context.commands);
+            } else {
+                await this.continueDialog(context);
             }
             await next();
         });
@@ -117,10 +115,12 @@ class SkypeBot extends ActivityHandler {
     }
 
     async executeCommands(context, commands = []) {
-        const commandIncluded = commands.find(command => command.name === 'iteration');
-        if (commandIncluded) {
-            const command = commands.find(command => command.name === 'iteration');
-            await reactOnCommand(command, context, this.botState);
+        const isAdminCommandNotInGroup = !context.activity.conversation.isGroup && commands[0] === 'iteration';
+        const isUserCommandNotInGroup = !context.activity.conversation.isGroup && commands[0] !== 'iteration';
+        const isUserCommandInGroup = context.activity.conversation.isGroup && commands[0] !== 'iteration';
+
+        if (commands && commands.length && (isAdminCommandNotInGroup || isUserCommandInGroup || isUserCommandNotInGroup)) {
+            await reactOnCommand(commands[0], context, this.botState);
         }
     }
 }

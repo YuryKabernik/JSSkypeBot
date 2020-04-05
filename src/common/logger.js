@@ -1,4 +1,3 @@
-
 class Logger {
     constructor(moduleName) {
         this.loggedModuleName = moduleName;

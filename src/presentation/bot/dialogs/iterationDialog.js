@@ -4,6 +4,7 @@ const { options } = require('./iterations/options.js');
 const { RemoveIterationDialog } = require('./iterations/remove.js');
 const { EditIterationDialog } = require('./iterations/edit.js');
 const { AddIterationDialog } = require('./iterations/add.js');
+const Injection = require('../../../configuration/registerTypes.js');
 
 const CHOICE_PRESENTED_OPTION_ITERATION_ACTIVITY = 'CHOICE_PRESENTED_OPTION_ITERATION_ACTIVITY_TYPE';
 
@@ -14,6 +15,7 @@ const ADD_ITERATION_WATERFALL_DIALOG = 'ADD_ITERATION_WATERFALL_DIALOG';
 class IterationDialog extends ComponentDialog {
     constructor(MAIN_ITERATION_WATERFALL_DIALOG, botState, finishCallback) {
         super(MAIN_ITERATION_WATERFALL_DIALOG);
+        this._logger = Injection.getInstance('Common.Logger', 'JokesDialog');
 
         this.botState = botState;
         this.finishCallback = finishCallback;
@@ -57,7 +59,7 @@ class IterationDialog extends ComponentDialog {
      * @param {WaterfallStepContext} stepContext
      */
     async initialStep(stepContext) {
-        console.log('MainDialog.initialStep');
+        this._logger.logInfo('MainDialog.initialStep');
         const stepOptions = options(CHOICE_PRESENTED_OPTION_ITERATION_ACTIVITY, stepContext);
         return await stepContext.prompt(CHOICE_PRESENTED_OPTION_ITERATION_ACTIVITY, stepOptions);
     }
@@ -67,21 +69,21 @@ class IterationDialog extends ComponentDialog {
      * @param {WaterfallStepContext} stepContext
      */
     async redirectIterationDialogStep(stepContext) {
-        console.log('MainDialog.redirectIterationDialogStep');
+        this._logger.logInfo('MainDialog.redirectIterationDialogStep');
         let nextDialogId = '';
         if (stepContext.result) {
             switch (stepContext.result.value) {
-            case 'add':
-                nextDialogId = ADD_ITERATION_WATERFALL_DIALOG;
-                break;
-            case 'edit':
-                nextDialogId = EDIT_ITERATION_WATERFALL_DIALOG;
-                break;
-            case 'remove':
-                nextDialogId = REMOVE_ITERATION_WATERFALL_DIALOG;
-                break;
-            default:
-                return await stepContext.replaceDialog(this.id);
+                case 'add':
+                    nextDialogId = ADD_ITERATION_WATERFALL_DIALOG;
+                    break;
+                case 'edit':
+                    nextDialogId = EDIT_ITERATION_WATERFALL_DIALOG;
+                    break;
+                case 'remove':
+                    nextDialogId = REMOVE_ITERATION_WATERFALL_DIALOG;
+                    break;
+                default:
+                    return await stepContext.replaceDialog(this.id);
             }
 
             return await stepContext.prompt(nextDialogId);
@@ -100,19 +102,19 @@ class IterationDialog extends ComponentDialog {
      * @param {WaterfallStepContext} stepContext
      */
     async finalStep(stepContext) {
-        console.log('MainDialog.finalStep');
+        this._logger.logInfo('MainDialog.finalStep');
 
         if (stepContext.result) {
             switch (stepContext.result.action) {
-            case 'DELETE':
-            case 'EDIT':
-            case 'ADD':
-                break;
-            default:
-                await stepContext.context.sendActivity(
-                    `Sorry, something went wrong :( Please сontact Yuri Kabernik-Berazouski to help you solve this problem.`
-                );
-                break;
+                case 'DELETE':
+                case 'EDIT':
+                case 'ADD':
+                    break;
+                default:
+                    await stepContext.context.sendActivity(
+                        `Sorry, something went wrong :( Please сontact Yuri Kabernik-Berazouski to help you solve this problem.`
+                    );
+                    break;
             }
         }
         await stepContext.context.sendActivity(

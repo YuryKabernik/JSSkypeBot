@@ -73,7 +73,7 @@ class AddIterationDialog extends ComponentDialog {
             const stepOptions = options(INPUT_DATE_AND_TIME, stepContext);
             return await stepContext.prompt(INPUT_DATE_AND_TIME, stepOptions);
         default:
-            return await stepContext.replaceDialog(this.id);
+            return await stepContext.replaceDialog(this.initialDialogId);
         }
 
         if (typeof (this.finishCallback) === 'function') {

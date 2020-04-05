@@ -14,6 +14,7 @@ const { IterationRepository } = require('../storage/IterationRepository.js');
 const { NotificationRepository } = require('../storage/NotificationRepository.js');
 const { StateManagement } = require('./dialogStateManagement.js');
 const { DbClient } = require('../services/dbClient.js');
+const { JokesClient } = require('../services/JokesClient.js');
 const { dbConnection } = require('./dbConnection.js');
 const { botAdapter } = require('./botAdapter.js');
 const { MemoryStorage } = require('botbuilder');
@@ -32,6 +33,7 @@ function registerTypes() {
         injector.register('Common.AnswersFormatter', (...args) => new AnswersFormatter(...args));
 
         injector.register('Services.DbClient', new DbClient(dbConnection()));
+        injector.register('Services.JokesClient', (...args) => new JokesClient(process.env.JokeService, ...args));
 
         injector.register('DAL.ReferenceRepository', new ReferenceRepository());
         injector.register('DAL.IterationRepository', new IterationRepository());

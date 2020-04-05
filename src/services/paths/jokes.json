@@ -1,0 +1,32 @@
+{
+    "sv443.net": {
+        "random": {
+            "method": "GET",
+            "path": "/jokeapi/v2/joke/Any?type=single",
+            "headers": {
+                "Accept": "application/json"
+            }
+        },
+        "categories": {
+            "method": "GET",
+            "path": "/jokeapi/v2/categories",
+            "headers": {
+                "Accept": "application/json"
+            }
+        },
+        "randomByCategory": {
+            "method": "GET",
+            "path": "/jokeapi/v2/joke/{0}?type=single",
+            "headers": {
+                "Accept": "application/json"
+            }
+        },
+        "search": {
+            "method": "GET",
+            "path": "/jokeapi/v2/joke/Any?contains={0}",
+            "headers": {
+                "Accept": "application/json"
+            }
+        }
+    }
+}
