@@ -34,9 +34,13 @@ class JokesClient {
      */
     async getJokeByCategory(category) {
         const endpointOptions = jokes[this.options.hostname].randomByCategory;
-        endpointOptions.path = endpointOptions.path.replace("{0}", category);
+        const requestOptions = {};
 
-        return await this._sendRequest(endpointOptions);
+        Object.assign(requestOptions, endpointOptions, {
+            path: endpointOptions.path.replace("{0}", category)
+        });
+
+        return await this._sendRequest(requestOptions);
     }
 
     /**

@@ -1,17 +1,20 @@
 /**
  * @file Prompt - middleware for parsing and identifying user commands.
  */
-/* eslint-disable no-useless-escape */
-const commandTemplateRegexp = new RegExp(/-\w+/, 'gi');
 
-module.exports.promptParser = async (context, next) => {
-    if (!context.activity.conversation.isGroup) {
+const { keyWords } = require('../configuration/promptKeyWords.js');
+
+const keysExpression = Object.keys(keyWords).join("|");
+const commandTemplateRegexp = new RegExp(`(${keysExpression})`, 'gi');
+
+module.exports = {
+    promptParser: async (context, next) => {
         const isCommandExists = commandTemplateRegexp.test(context.activity.text);
         if (isCommandExists) {
             context.commands = parseCommandInput(context.activity.text);
         }
+        await next();
     }
-    await next();
 };
 
 function parseCommandInput(inputString = '') {

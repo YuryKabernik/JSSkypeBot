@@ -1,5 +1,6 @@
 const { ActivityHandler } = require('botbuilder');
 const { reactOnCommand, continueBotDialog } = require('./utils/reactOnCommand.js');
+const { isAdminKeyWord, isUserKeyWord } = require('../../configuration/promptKeyWords.js');
 const { birthdayDates } = require('../../features/proactiveMessaging/birthdayCongratulation/birthdayDates.js');
 const { holidays } = require('../../features/proactiveMessaging/holidayReminder/holidays.js');
 const Injection = require('../../configuration/registerTypes.js');
@@ -115,11 +116,11 @@ class SkypeBot extends ActivityHandler {
     }
 
     async executeCommands(context, commands = []) {
-        const isAdminCommandNotInGroup = !context.activity.conversation.isGroup && commands[0] === 'iteration';
-        const isUserCommandNotInGroup = !context.activity.conversation.isGroup && commands[0] !== 'iteration';
-        const isUserCommandInGroup = context.activity.conversation.isGroup && commands[0] !== 'iteration';
+        const isAdminCommandNotInGroup = !context.activity.conversation.isGroup && isAdminKeyWord(commands[0].name);
+        const isUserCommandNotInGroup = !context.activity.conversation.isGroup && isUserKeyWord(commands[0].name);
+        const isUserCommandInGroup = context.activity.conversation.isGroup && isUserKeyWord(commands[0].name);
 
-        if (commands && commands.length && (isAdminCommandNotInGroup || isUserCommandInGroup || isUserCommandNotInGroup)) {
+        if (commands.length && (isAdminCommandNotInGroup || isUserCommandInGroup || isUserCommandNotInGroup)) {
             await reactOnCommand(commands[0], context, this.botState);
         }
     }

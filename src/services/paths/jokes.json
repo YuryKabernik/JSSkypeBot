@@ -28,5 +28,35 @@
                 "Accept": "application/json"
             }
         }
+    },
+    "umorili.herokuapp.com": {
+        "random": {
+            "method": "GET",
+            "path": "/api/random?num=1",
+            "headers": {
+                "Accept": "application/json"
+            }
+        },
+        "categories": {
+            "method": "GET",
+            "path": "/api/sources",
+            "headers": {
+                "Accept": "application/json"
+            }
+        },
+        "randomByCategory": {
+            "method": "GET",
+            "path": "/api/get?site=anekdot.ru&name={0}&num=20",
+            "headers": {
+                "Accept": "application/json"
+            }
+        },
+        "search": {
+            "method": "GET",
+            "path": "",
+            "headers": {
+                "Accept": "application/json"
+            }
+        }
     }
 }

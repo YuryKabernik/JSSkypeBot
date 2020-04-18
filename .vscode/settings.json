@@ -1,3 +1,7 @@
 {
-    "appService.showBuildDuringDeployPrompt": false
+    "appService.showBuildDuringDeployPrompt": false,
+    "editor.rulers": [
+        90,
+        140
+    ]
 }

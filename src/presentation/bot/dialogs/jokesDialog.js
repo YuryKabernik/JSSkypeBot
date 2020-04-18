@@ -58,7 +58,9 @@ class JokesDialog extends ComponentDialog {
         const stepOptions = options(CHOICE_PRESENTED_OPTION_JOKE_CATEGORY, stepContext);
 
         const body = await this._jokesService.getCategories();
-        stepOptions.choices = ChoiceFactory.toChoices(body.categories);
+        stepOptions.choices = ChoiceFactory.toChoices(
+            body.categories || body[2].map(cat => cat.name)
+        );
 
         if (!stepOptions.choices || !stepOptions.choices.length) {
             await stepContext.context.sendActivity(`Sorry, I don't remember what categories available :(`);
@@ -76,9 +78,10 @@ class JokesDialog extends ComponentDialog {
     async showRandomJokeDialogStep(stepContext) {
         this._logger.logInfo('JokesDialog - showRandomJokeDialogStep');
 
-        const jokeData = await this._jokesService.getJokeByCategory(stepContext.result.value);
+        const jokeData = await this._jokesService.getJokeByCategory(encodeURIComponent(stepContext.result.value));
+        const getRundomIndex = (max) => Math.floor(Math.random() * Math.floor(max));
 
-        await stepContext.context.sendActivity(jokeData.joke);
+        await stepContext.context.sendActivity(jokeData.joke || jokeData[getRundomIndex(10)].elementPureHtml);
 
         return await stepContext.next();
     }
