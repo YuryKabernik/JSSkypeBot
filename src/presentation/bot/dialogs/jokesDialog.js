@@ -10,8 +10,7 @@ const CONFIRM_SHOW_ONE_MORE_JOKE = 'CONFIRM_SHOW_ONE_MORE_JOKE';
 class JokesDialog extends ComponentDialog {
     constructor(WATERFALL_DIALOG_ID, botState, finishCallback) {
         super(WATERFALL_DIALOG_ID);
-        this._logger = Injection.getInstance('Common.Logger', 'JokesDialog');
-        this._jokesService = Injection.getInstance('Services.JokesClient');
+        this._jokesService = Injection.getInstance('SkypeBot.Jokes');
 
         this.botState = botState;
         this.finishCallback = finishCallback;
@@ -54,15 +53,12 @@ class JokesDialog extends ComponentDialog {
      * @param {WaterfallStepContext} stepContext
      */
     async initialStep(stepContext) {
-        this._logger.logInfo('JokesDialog - initialStep');
         const stepOptions = options(CHOICE_PRESENTED_OPTION_JOKE_CATEGORY, stepContext);
 
-        const body = await this._jokesService.getCategories();
-        stepOptions.choices = ChoiceFactory.toChoices(
-            body.categories || body[2].map(cat => cat.name)
-        );
+        const jokeData = await this._jokesService.getCategories();
+        stepOptions.choices = ChoiceFactory.toChoices(jokeData && jokeData.categories);
 
-        if (!stepOptions.choices || !stepOptions.choices.length) {
+        if (!jokeData || !stepOptions.choices || !stepOptions.choices.length) {
             await stepContext.context.sendActivity(`Sorry, I don't remember what categories available :(`);
             await stepContext.context.sendActivity(`Please сontact Yuri Kabernik-Berazouski to help you solve this problem.`);
             return await stepContext.endDialog();
@@ -76,12 +72,13 @@ class JokesDialog extends ComponentDialog {
      * @param {WaterfallStepContext} stepContext
      */
     async showRandomJokeDialogStep(stepContext) {
-        this._logger.logInfo('JokesDialog - showRandomJokeDialogStep');
+        const jokeData = await this._jokesService.getJokeByCategory(stepContext.result.value);
 
-        const jokeData = await this._jokesService.getJokeByCategory(encodeURIComponent(stepContext.result.value));
-        const getRundomIndex = (max) => Math.floor(Math.random() * Math.floor(max));
-
-        await stepContext.context.sendActivity(jokeData.joke || jokeData[getRundomIndex(10)].elementPureHtml);
+        if (jokeData) {
+            await stepContext.context.sendActivity(jokeData.joke);
+        } else {
+            await stepContext.context.sendActivity("Sorry, but the selected source doesn't contains jokes :(");
+        }
 
         return await stepContext.next();
     }
@@ -91,8 +88,6 @@ class JokesDialog extends ComponentDialog {
      * @param {WaterfallStepContext} stepContext
      */
     async showAnotherJokeConfirmation(stepContext) {
-        this._logger.logInfo('JokesDialog - showAnotherJokeConfirmation');
-
         const stepOptions = options(CONFIRM_SHOW_ONE_MORE_JOKE, stepContext);
         return await stepContext.prompt(CONFIRM_SHOW_ONE_MORE_JOKE, stepOptions);
     }
@@ -102,8 +97,6 @@ class JokesDialog extends ComponentDialog {
      * @param {WaterfallStepContext} stepContext
      */
     async finalStep(stepContext) {
-        this._logger.logInfo('JokesDialog -- finalStep');
-
         if (stepContext.result) {
             return await stepContext.replaceDialog(this.initialDialogId);
         }

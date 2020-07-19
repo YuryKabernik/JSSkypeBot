@@ -32,7 +32,7 @@
     "umorili.herokuapp.com": {
         "random": {
             "method": "GET",
-            "path": "/api/random?num=1",
+            "path": "/api/random?num=20",
             "headers": {
                 "Accept": "application/json"
             }

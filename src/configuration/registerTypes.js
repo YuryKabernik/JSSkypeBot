@@ -2,6 +2,7 @@ const { Container } = require('../common/injector.js');
 const { Logger } = require('../common/logger.js');
 const { FileLogger } = require('../common/fileLogger.js');
 const { SkypeBot } = require('../presentation/bot/bot.js');
+const { Jokes } = require('../features/joker/joke.js');
 const { IllnessAnswering } = require('../features/messageAnswering/illnessAnswering.js');
 const { Сongratulator } = require('../features/proactiveMessaging/birthdayCongratulation/congratulator.js');
 const { AnswerDecision } = require('../features/messageAnswering/answerDecision.js');
@@ -47,6 +48,7 @@ function registerTypes() {
         injector.register('SkypeBot.NewIteration', new NewIteration());
         injector.register('SkypeBot.WeeklyReminder', new WeeklyReminder());
         injector.register('SkypeBot.State', new StateManagement());
+        injector.register('SkypeBot.Jokes', new Jokes());
 
         injector.register('Bot.SkypeBot', new SkypeBot());
         injector.register('Bot.Adapter', botAdapter());
