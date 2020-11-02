@@ -12,7 +12,8 @@ class AnswerDecision {
         message = message.toLowerCase();
         const remoteWorkPhrases = keyPhrases.continueRemoteWork.concat(
             keyPhrases.startRemoteWork,
-            keyPhrases.commonRemoteWork
+            keyPhrases.commonRemoteWork,
+            keyPhrases.haveToLeave
         ).map(phrase => phrase.toLowerCase());
         if (remoteWorkPhrases.some(keyPhrase => message.includes(keyPhrase))) {
             return this.answersFormatter.format('doNotDenyYourselfAnything', { name: userName });
