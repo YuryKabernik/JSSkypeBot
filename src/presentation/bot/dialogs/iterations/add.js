@@ -69,9 +69,10 @@ class AddIterationDialog extends ComponentDialog {
         case 'tomorrow':
             selectedDate.setDate(selectedDate.getDate() + 1);
             break;
-        case 'input':
+        case 'input': {
             const stepOptions = options(INPUT_DATE_AND_TIME, stepContext);
             return await stepContext.prompt(INPUT_DATE_AND_TIME, stepOptions);
+        }
         default:
             return await stepContext.replaceDialog(this.id);
         }
@@ -105,12 +106,13 @@ class AddIterationDialog extends ComponentDialog {
         console.log('AddIterationDialog.confirmInputStep');
 
         switch (stepContext.result) {
-        case true:
+        case true: {
             const iteration = stepContext.values.iteration;
             await stepContext.context.sendActivity(
                 `Iteration notification will be Added. Date: ${ iteration.date } Path: ${ iteration.path }.`
             );
             break;
+        }
         case false:
             return await stepContext.endDialog();
         default:

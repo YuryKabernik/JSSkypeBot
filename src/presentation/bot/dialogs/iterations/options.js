@@ -142,7 +142,7 @@ module.exports.options = function (key, stepContext) {
         },
         CONFIRM_CONTINUE_EDITING: {
             style: ListStyle.suggestedAction,
-            prompt: `Should I modify the selected iteration with the new one?`,
+            prompt: 'Should I modify the selected iteration with the new one?',
             retryPrompt: 'That was not a valid choice, please select one of the provided options or prompt +/-/yes/no.',
             choices: [
                 {
@@ -167,7 +167,7 @@ module.exports.options = function (key, stepContext) {
         },
         CONFIRM_INPUT_ON_ADD: {
             style: ListStyle.suggestedAction,
-            prompt: `Should I save & schedule the entered iteration?`,
+            prompt: 'Should I save & schedule the entered iteration?',
             retryPrompt: 'That was not a valid choice, please select one of the provided options or prompt +/-/yes/no.',
             choices: [
                 {

@@ -16,12 +16,12 @@ class NewIteration {
     async addIterations(iterations = []) {
         for (let index = 0; index < iterations.length; index++) {
             const iteration = iterations[index];
-            const id = guid(`${iteration.path} ${iteration.date}`);
+            const id = guid(`${ iteration.path } ${ iteration.date }`);
             await this.iterations.save({
-                id: id,
+                id,
                 data: iteration
             });
-            this.logger.logInfo(`New iteration saved ${iteration.path}`);
+            this.logger.logInfo(`New iteration saved ${ iteration.path }`);
         }
     }
 
@@ -46,17 +46,17 @@ class NewIteration {
                     }).then(() =>
                         this._removeSheduledIterationNotification(iteration.id, scheduledCongradulation)
                     ).catch(error => this.logger.logError(
-                        `Iteration Notification executions failed! Message: ${error.message} Stack: ${error.stack}`
+                        `Iteration Notification executions failed! Message: ${ error.message } Stack: ${ error.stack }`
                     ))
                 );
             }, { timezone: process.env.Timezone });
 
             const scheduledEventExists = this.scheduledIterationNotifications.filter(task => task.taskId === iteration.id)[0];
             if (scheduledEventExists) {
-                this.logger.logInfo(`Sheduled iteration event already exists: CRON-DATE-TIME:[${dateExpression}]`);
+                this.logger.logInfo(`Sheduled iteration event already exists: CRON-DATE-TIME:[${ dateExpression }]`);
                 scheduledCongradulation.destroy();
             } else {
-                this.logger.logInfo(`New iteration event scheduled: CRON-DATE-TIME:[${dateExpression}]`);
+                this.logger.logInfo(`New iteration event scheduled: CRON-DATE-TIME:[${ dateExpression }]`);
                 this.scheduledIterationNotifications.push({ taskId: iteration.id, scheduledCongradulation });
             }
         });

@@ -19,6 +19,6 @@ server
     .listen(process.env.port || process.env.PORT || 3978, () => {
         start(server);
         console.info(`${ server.name } listening to ${ server.url }`);
-        console.info(`Get Bot Framework Emulator: https://aka.ms/botframework-emulator`);
-        console.info(`To test your bot, see: https://aka.ms/debug-with-emulator`);
+        console.info('Get Bot Framework Emulator: https://aka.ms/botframework-emulator');
+        console.info('To test your bot, see: https://aka.ms/debug-with-emulator');
     });

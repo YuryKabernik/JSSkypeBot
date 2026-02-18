@@ -18,7 +18,7 @@ class Сongratulator {
         conversationReferences
             .filter(reference => reference.conversation && reference.conversation.isGroup)
             .forEach(reference => {
-                this._logger.logInfo(`Scheduling birthday congradulations to the conversation: ${reference.conversation.id}`);
+                this._logger.logInfo(`Scheduling birthday congradulations to the conversation: ${ reference.conversation.id }`);
                 this.scheduleBirthdayCongraduloations(reference, sendEventCallback);
             });
     }
@@ -30,20 +30,20 @@ class Сongratulator {
             const scheduledCongradulation = cron.schedule(dateExpression, () => {
                 sendEventCallback(conversationReference, async (turnContext) => {
                     new Promise(resolve => {
-                        turnContext.sendActivity(`С днём рождения, *${birthdayDate.name}*!`);
+                        turnContext.sendActivity(`С днём рождения, *${ birthdayDate.name }*!`);
                         resolve();
                     }).catch(error => this._logger.logError(
-                        `Birthday Notification for ${birthdayDate.name} executions failed! \nMessage: ${error.message} \nStack: ${error.stack}`
-                    ))
+                        `Birthday Notification for ${ birthdayDate.name } executions failed! \nMessage: ${ error.message } \nStack: ${ error.stack }`
+                    ));
                 });
             }, { timezone: process.env.Timezone });
 
             const scheduledEventExists = this.scheduledCongradulations.filter(task => task.taskId === taskId)[0];
             if (scheduledEventExists) {
-                this._logger.logInfo(`Congradulation destroyed - taskId: ${taskId}`);
+                this._logger.logInfo(`Congradulation destroyed - taskId: ${ taskId }`);
                 scheduledCongradulation.destroy();
             } else {
-                this._logger.logInfo(`Congradulation scheduled - taskId: ${taskId}`);
+                this._logger.logInfo(`Congradulation scheduled - taskId: ${ taskId }`);
                 this.scheduledCongradulations.push({ taskId, scheduledCongradulation });
             }
         });

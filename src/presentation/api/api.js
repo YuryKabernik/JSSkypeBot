@@ -7,15 +7,15 @@ module.exports.apiRoutes = function getRouts(router) {
 
     router.mount(
         { method: 'POST', path: '/api/notify/iterations', name: 'NotifyIterations' },
-        [(req, res) => notificationsController.iterations(req, res)]
+        [async (req, res) => await notificationsController.iterations(req, res)]
     );
     router.mount(
         { method: 'POST', path: '/api/notify/weekly', name: 'NotifyWeekly' },
-        [(req, res) => notificationsController.weekly(req, res)]
+        [async (req, res) => await notificationsController.weekly(req, res)]
     );
     router.mount(
         { method: 'POST', path: '/api/messages', name: 'BotMessages' },
-        [(req, res) => messagingController.messages(req, res)]
+        [async (req, res) => await messagingController.messages(req, res)]
     );
 
     return router;

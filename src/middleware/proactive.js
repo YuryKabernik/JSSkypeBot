@@ -8,7 +8,7 @@ const { MicrosoftAppCredentials } = require('botframework-connector');
  */
 module.exports.trustServiceUrl = async (context, next) => {
     if (!MicrosoftAppCredentials.isTrustedServiceUrl(context.activity.serviceUrl)) {
-        MicrosoftAppCredentials.trustServiceUrl(serviceUrl);
+        MicrosoftAppCredentials.trustServiceUrl(context.activity.serviceUrl);
     }
     await next();
 };
