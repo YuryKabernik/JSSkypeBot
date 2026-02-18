@@ -2,7 +2,7 @@
  * @file Prompt - middleware for parsing and identifying user commands.
  */
 /* eslint-disable no-useless-escape */
-const commandTemplateRegexp = new RegExp(/-\w+/, 'gi');
+const commandTemplateRegexp = /-\w+/gi;
 
 module.exports.promptParser = async (context, next) => {
     if (!context.activity.conversation.isGroup) {

@@ -86,12 +86,13 @@ class RemoveIterationDialog extends ComponentDialog {
         console.log('RemoveIterationDialog.finishStep');
 
         switch (stepContext.result) {
-        case true:
+        case true: {
             const iteration = stepContext.values.iteration;
             await stepContext.context.sendActivity(
                 `Iteration notification will be removed. Date: ${ iteration.date } Path: ${ iteration.path }.`
             );
             break;
+        }
         case false:
             return await stepContext.endDialog();
         default:

@@ -140,15 +140,16 @@ class EditIterationDialog extends ComponentDialog {
         console.log('EditIterationDialog.finishStep');
 
         switch (stepContext.result) {
-        case true:
+        case true: {
             const iteration = stepContext.values.iterationModified;
             await stepContext.context.sendActivity(
                 `Iteration notification will be modified. Date: ${ iteration.date } Path: ${ iteration.path }.`
             );
             break;
+        }
         case false:
             await stepContext.context.sendActivity(
-                `Modification process stopped.`
+                'Modification process stopped.'
             );
             if (typeof (this.finishCallback) === 'function') {
                 await this.finishCallback();

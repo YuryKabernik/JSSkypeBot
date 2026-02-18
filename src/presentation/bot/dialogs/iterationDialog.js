@@ -87,7 +87,7 @@ class IterationDialog extends ComponentDialog {
             return await stepContext.prompt(nextDialogId);
         }
         await stepContext.context.sendActivity(
-            `Let me know when you'll decide to schedule, delete or update any iteration info.`
+            'Let me know when you\'ll decide to schedule, delete or update any iteration info.'
         );
         if (typeof (this.finishCallback) === 'function') {
             await this.finishCallback(stepContext.result, this.botState);
@@ -110,7 +110,7 @@ class IterationDialog extends ComponentDialog {
                 break;
             default:
                 await stepContext.context.sendActivity(
-                    `Sorry, something went wrong :( Please сontact Yuri Kabernik-Berazouski to help you solve this problem.`
+                    'Sorry, something went wrong :( Please сontact Yuri Kabernik-Berazouski to help you solve this problem.'
                 );
                 break;
             }

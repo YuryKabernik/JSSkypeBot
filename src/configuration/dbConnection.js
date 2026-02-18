@@ -6,9 +6,15 @@ module.exports.dbConnection = function dbConnection() {
     const errorHandler = error => error && logger.logError(error);
     const connectionString = process.env.ConnectionString;
 
-    const connection = new sql.ConnectionPool(connectionString, errorHandler);
+    if (!connectionString) {
+        logger.logInfo('No ConnectionString provided, skipping database connection');
+        return null;
+    }
 
-    if (!connection.config.options.useUTC) {
+    const connection = new sql.ConnectionPool(connectionString);
+    connection.on('error', errorHandler);
+
+    if (connection.config && connection.config.options && !connection.config.options.useUTC) {
         connection.config.options.useUTC = false;
     }
     return connection;
